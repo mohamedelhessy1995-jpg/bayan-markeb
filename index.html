@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>بيان مركب</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="بيان مركب">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f2d44">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one phone-width column of form sections, a sticky action bar, and a modal that previews the exported image. */
+:root{
+  --bg:#eef2f5; --card:#ffffff; --ink:#0f2d44; --mute:#5b6b78; --line:#d6dde3;
+  --accent:#c8541a; --accent-ink:#ffffff; --good:#1b7f79; --warn:#b3261e; --soft:#f3f6f8;
+  --font:Tahoma,'Noto Naskh Arabic',Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1a24; --card:#152633; --ink:#e7eef3; --mute:#93a6b4; --line:#2a3f50;
+  --accent:#ee7a3e; --accent-ink:#1a0e06; --good:#4cc2ba; --warn:#ff8a80; --soft:#1b3040; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1a24; --card:#152633; --ink:#e7eef3; --mute:#93a6b4; --line:#2a3f50;
+  --accent:#ee7a3e; --accent-ink:#1a0e06; --good:#4cc2ba; --warn:#ff8a80; --soft:#1b3040; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;direction:rtl;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 96px}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding-top:14px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:6px}
+header.top h1{font-size:26px;font-weight:800;margin:0;line-height:1.2}
+header.top p{margin:0;color:var(--mute);font-size:13px}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+section>h2{margin:0;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:8px}
+section>h2 small{font-weight:400;color:var(--mute);font-size:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid .full{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--mute);min-width:0}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px;width:100%;min-width:0}
+textarea{min-height:92px;resize:vertical;line-height:1.6}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input[readonly]{background:var(--soft);font-weight:700}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);min-height:44px;padding:0 14px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+button.ghost{background:transparent}
+button.danger{color:var(--warn)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:var(--bg);min-height:44px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--card);font-weight:700}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:none;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:38px;padding:0 12px;border-radius:999px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.eq{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.eq div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--mute)}
+.eq .n{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;gap:4px;width:100%;direction:ltr;align-items:center}
+.eq .n input{text-align:center;padding:6px 2px;font-weight:700;min-width:0}
+.eq .n button{min-height:38px;min-width:34px;padding:0;font-size:20px;line-height:1;touch-action:manipulation}
+.calc{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.calc .h{font-size:12px;color:var(--mute);text-align:center}
+.calc .r{font-weight:700;color:var(--ink);align-self:center;font-size:14px}
+.calc input{text-align:center;padding:8px 4px}
+.bar{height:12px;background:var(--soft);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--good);width:0}
+.barinfo{display:flex;justify-content:space-between;font-size:13px;color:var(--mute);font-variant-numeric:tabular-nums}
+.srow{display:grid;grid-template-columns:110px 1fr auto;gap:8px;align-items:center}
+.stop{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;padding:10px;background:var(--soft);border-radius:10px}
+.stop .wide{grid-column:span 3}
+.stop>label:first-child,.stop .half{grid-column:span 2}
+.stop .del{align-self:end}
+.num{font-variant-numeric:tabular-nums}
+.note{background:var(--soft);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--mute);display:flex;gap:10px;align-items:center;justify-content:space-between}
+.bottom{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--card);border-top:1px solid var(--line);
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.bottom .in{max-width:640px;margin:0 auto;display:flex;gap:10px}
+.bottom .primary{flex:1;min-height:50px;font-size:17px}
+.modal{position:fixed;top:0;right:0;bottom:0;left:0;z-index:20;background:rgba(5,12,18,.72);display:flex;align-items:flex-start;justify-content:center;overflow:auto;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--card);border-radius:14px;max-width:560px;width:100%;padding:14px;display:flex;flex-direction:column;gap:12px}
+.sheet img{width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff;display:block}
+.sheet .row{display:flex;gap:10px;flex-wrap:wrap}
+.sheet .row>*{flex:1 1 140px}
+.hint{font-size:13px;color:var(--mute);margin:0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--card);padding:10px 16px;border-radius:999px;font-size:14px;z-index:30;max-width:90%}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink);font-weight:800}.periodic-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.periodic-grid .full{grid-column:1/-1}.periodic-field{display:flex;flex-direction:column;gap:4px;min-width:0}.periodic-field>label{font-size:13px;color:var(--mute)}.periodic-stepper{display:grid;grid-template-columns:48px minmax(0,1fr) 48px;gap:6px;align-items:center;direction:ltr;width:100%}.periodic-stepper button{min-height:48px;min-width:48px;font-size:23px;font-weight:800;padding:0;background:var(--soft);touch-action:manipulation;position:relative;z-index:2;pointer-events:auto;cursor:pointer}.periodic-stepper input{min-width:0;text-align:center;font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}.equip-card,.contractor-card{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--soft)}.equip-card h3,.contractor-card h3{margin:0;font-size:14px}.update-list{display:flex;flex-direction:column;gap:8px}.update-item{border:1px solid var(--line);border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:8px}.update-item .actions{display:flex;gap:8px;flex-wrap:wrap}.update-item .actions button{flex:1}.periodic-preview{white-space:pre-wrap;background:var(--soft);border-radius:9px;padding:12px;font-size:13px;line-height:1.8;max-height:340px;overflow:auto}.history-list{display:flex;flex-direction:column;gap:8px}.history-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--soft)}.history-item .meta{display:flex;flex-direction:column;min-width:0}.history-item small{color:var(--mute)}.history-item button{flex:none}
+@media (max-width:420px){.eq{grid-template-columns:repeat(2,1fr)}.stop{grid-template-columns:1fr 1fr}.stop .wide{grid-column:span 2}.stop>label:first-child,.stop .half{grid-column:span 1}}
+@media (max-width:520px){.periodic-stepper{grid-template-columns:44px minmax(0,1fr) 44px;gap:4px}.periodic-stepper button{min-width:44px;min-height:46px;font-size:22px}.periodic-stepper input{padding:8px 2px}}
+@media (max-width:360px){.periodic-grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+
+.clock-overlay{position:fixed;top:0;right:0;bottom:0;left:0;z-index:100;background:rgba(5,12,18,.72);display:flex;align-items:center;justify-content:center;padding:14px}
+.clock-panel{width:min(100%,390px);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 12px 40px #0005;display:flex;flex-direction:column;gap:12px}
+.clock-title{display:flex;align-items:center;justify-content:space-between;font-weight:800;font-size:17px}
+.clock-face{width:min(82vw,330px);height:min(82vw,330px);max-height:330px;max-width:330px;position:relative;margin:0 auto;border-radius:50%;background:radial-gradient(circle at center,var(--card) 0 23%,var(--soft) 23.5% 100%);border:2px solid var(--line);box-shadow:inset 0 0 0 7px rgba(200,84,26,.10),0 5px 18px #0002;touch-action:manipulation;transition:transform .22s ease,opacity .22s ease}
+.clock-face.flip{transform:rotateX(65deg) scale(.92);opacity:.25}
+.clock-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:76px;height:76px;border-radius:50%;background:var(--ink);color:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:900;font-size:22px;box-shadow:0 3px 12px #0003;pointer-events:none}
+.clock-center small{font-size:10px;font-weight:600;opacity:.8}
+.clock-num{position:absolute;transform:translate(-50%,-50%);border-radius:50%;width:39px;height:39px;min-height:39px;padding:0;border:1px solid var(--line);background:var(--card);font-weight:800;font-size:14px;touch-action:manipulation;box-shadow:0 2px 5px #0001;z-index:1}
+.clock-num.inner{width:32px;height:32px;min-height:32px;font-size:11px;background:var(--bg)}
+.clock-num[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 0 0 4px rgba(200,84,26,.22)}
+.clock-minutes{display:flex;align-items:center;justify-content:center;gap:14px}
+.clock-minutes button{min-width:48px;min-height:42px;font-weight:900;font-size:18px}
+.clock-minutes .minute-step{border-radius:50%;width:44px;min-width:44px;height:44px;padding:0;font-size:24px;background:var(--soft)}
+.clock-hint{text-align:center;color:var(--mute);font-size:12px}
+.clock-actions{display:flex;gap:8px}.clock-actions button{flex:1}
+
+button{-webkit-appearance:none;appearance:none;-webkit-text-fill-color:currentColor}
+.tabs button[aria-pressed="true"],.seg button[aria-pressed="true"],.chip[aria-pressed="true"]{background:#0f2d44;color:#fff;border-color:#0f2d44}
+button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tabs button[aria-pressed="true"],:root:not([data-theme="light"]) .seg button[aria-pressed="true"],:root:not([data-theme="light"]) .chip[aria-pressed="true"]{background:#e7eef3;color:#0d1a24;border-color:#e7eef3}:root:not([data-theme="light"]) button.primary{background:#ee7a3e;border-color:#ee7a3e;color:#1a0e06}}
+@supports (-webkit-touch-callout:none){input,select,textarea{font-size:16px}}
+.sheet img{-webkit-touch-callout:default;-webkit-user-select:none;user-select:none}
+#errBanner{position:fixed;left:0;right:0;bottom:0;z-index:99;background:#b3261e;color:#fff;font:13px/1.5 Tahoma,Arial,sans-serif;padding:10px 14px;direction:ltr;text-align:left;word-break:break-word}
+.fac-row{display:grid;grid-template-columns:minmax(0,1fr) 96px auto;gap:8px;align-items:end;padding:10px;background:var(--soft);border-radius:10px}
+@media (max-width:480px){.fac-row{grid-template-columns:minmax(0,1fr) auto}.fac-row>label:first-child{grid-column:1/-1}}
+</style>
+<script>document.documentElement.setAttribute("dir","rtl");document.documentElement.setAttribute("lang","ar");window.addEventListener('error',function(e){try{var d=document.getElementById('errBanner')||document.createElement('div');d.id='errBanner';d.textContent='JS error: '+(e.message||'')+' @'+(e.lineno||'');(document.body||document.documentElement).appendChild(d);}catch(x){}});</script>
+
+<noscript><div style="padding:16px;margin:12px;background:#fff4ec;border:2px solid #c8541a;border-radius:10px;font:16px/1.7 Tahoma,Arial,sans-serif;color:#0f2d44">⚠️ الأداة تحتاج JavaScript. إذا فتحتها من معاينة واتساب أو الملفات: اضغط مشاركة ثم «فتح في Safari» (أو احفظها في الملفات وافتحها بـ Safari/Chrome).</div></noscript>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>بيان مركب</h1>
+      <p>سيسكو ترانس للوجستيات المتطورة — فرع دمياط</p>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+      <button type="button" id="downloadApp" hidden class="primary" title="تنزيل نسخة HTML من الأداة">تنزيل الأداة</button>
+      <button type="button" id="openSettings" class="ghost" aria-label="الإعدادات" title="الإعدادات">⚙ الإعدادات</button>
+    </div>
+  </header>
+
+  <label id="lUser" style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px"><span><strong style="color:var(--ink)">اسم المُعِد</strong> — إلزامي، ويظهر في التقرير</span><input id="user" type="text" autocomplete="name" placeholder="اكتب اسمك"></label>
+  <div class="tabs" role="tablist" aria-label="نوع البيان"><button type="button" id="tabEnd" aria-pressed="true">بيان نهاية الوردية</button><button type="button" id="tabPeriodic" aria-pressed="false">بيان دوري</button></div>
+  <div id="endPanel">
+  <div class="note" id="exampleNote" hidden="">
+    <span>الأرقام الظاهرة مثال تجريبي، مش بيانات حقيقية.</span>
+    <button id="clearExample" class="ghost">امسح وابدأ</button>
+  </div>
+
+  <section aria-label="العملية والوردية">
+    <h2>العملية والوردية</h2>
+    <div class="seg" role="group" aria-label="نوع العملية">
+      <button type="button" data-op="تفريغ" aria-pressed="true">تفريغ</button>
+      <button type="button" data-op="شحن" aria-pressed="false">شحن</button>
+    </div>
+    <div class="seg" role="group" aria-label="اختيار الوردية">
+      <button type="button" data-shift="نهاري" aria-pressed="true">نهارية</button>
+      <button type="button" data-shift="ليلي" aria-pressed="false">ليلية</button>
+    </div>
+  </section>
+
+  <section aria-label="المراكب المحفوظة">
+    <h2>المراكب <small id="vcount"></small></h2>
+    <div class="chips" id="chips"></div>
+    <div class="grid">
+      <button id="newVessel">+ بيان جديد</button>
+      <button id="newDay" title="يحفظ ملخص الوردية الحالية ويبدأ يومًا جديدًا">يوم جديد لنفس المركب</button>
+    </div>
+    <div class="note"><strong id="historyCount">الورديات المحفوظة: 0</strong><span>للمركب المحدد</span></div>
+    <div id="historyList" class="history-list"><p class="hint">لا توجد ورديات محفوظة لهذا المركب.</p></div>
+  </section>
+
+  <section aria-label="بيانات المركب">
+    <h2>بيانات المركب</h2>
+    <div class="grid">
+      <label class="full">اسم المركب<input id="name" data-k="name" type="text" autocomplete="off" placeholder="مثال: MV SEA STAR"></label>
+      <label class="full">العميل / الشركة<input id="client" data-k="client" type="text" autocomplete="off"></label>
+      <label>البضاعة<input id="cargo" data-k="cargo" type="text" autocomplete="off"></label>
+      <label>الكمية الكلية (طن)<input id="qty" data-k="qty" type="text" inputmode="decimal" autocomplete="off"></label>
+      <label>الرصيف<input id="berth" data-k="berth" type="text" inputmode="numeric" autocomplete="off"></label>
+      <label>عدد العنابر<input id="holds" data-k="holds" type="text" inputmode="numeric" autocomplete="off" placeholder="مثال: 5"></label>
+      <div class="full" style="display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:13px;color:var(--mute)">المخزن / الساحة</span>
+        <div id="stores" style="display:flex;flex-direction:column;gap:8px"></div>
+        <button type="button" id="addStore">+ إضافة مخزن أو ساحة</button>
+      </div>
+      <label class="full">التاريخ<input id="date" data-k="date" type="date"></label>
+    </div>
+  </section>
+
+  <section id="factoriesEnd" aria-label="مصانع العلف" hidden>
+    <h2>مصانع العلف <small>كل مصنع في عنبر</small></h2>
+    <div class="fac-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <button type="button" class="addFactory">+ إضافة مصنع</button>
+  </section>
+
+  <section aria-label="المعدات">
+    <h2>المعدات العاملة <small>عدد كل نوع</small></h2>
+    <div class="eq" id="eq"></div>
+  </section>
+
+  <section aria-label="الكميات">
+    <h2>الكميات بالطن</h2>
+    <div class="grid">
+      <label>الإجمالي الحالي<input id="total" data-k="total" type="text" inputmode="decimal" autocomplete="off"></label>
+      <label><span id="curT">كمية الوردية الحالية</span><input id="cur" data-k="cur" type="text" inputmode="decimal" autocomplete="off"></label>
+      <label class="full">المتبقي<input id="remAll" readonly="" aria-live="polite"></label>
+    </div>
+    <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+    <div class="barinfo"><span id="pct">0%</span><span id="barTxt"></span></div>
+  </section>
+
+  <section aria-label="التوقفات">
+    <h2>التوقفات <small id="stopTot"></small></h2>
+    <div id="stops" style="display:flex;flex-direction:column;gap:10px"></div>
+    <button id="addStop">+ إضافة توقف</button>
+  </section>
+
+  <section aria-label="العمالة">
+    <h2>العمالة العاملة خلال الوردية</h2>
+    <div class="grid">
+      <label>اسم المقاول<input id="laborContractor" data-k="laborContractor" type="text" placeholder="اسم شركة / مقاول العمالة"></label>
+      <label>عدد العمال<input id="laborCount" data-k="laborCount" type="number" min="0" inputmode="numeric" placeholder="0"></label>
+    </div>
+  </section>
+
+  <section aria-label="البيان">
+    <h2>البيان</h2>
+    <label id="lNoteD">بيان الوردية النهارية<textarea id="noteD" data-k="noteD" placeholder="كل سطر بيان: يومي تخزين، إجمالي تحميل، ملاحظات..."></textarea></label>
+    <label id="lNoteN">بيان الوردية الليلية<textarea id="noteN" data-k="noteN"></textarea></label>
+  </section>
+
+  <section id="danger" aria-label="حذف">
+    <div id="delBox"><button id="delVessel" class="danger ghost">حذف هذا المركب</button></div>
+  </section>
+  </div><!-- endPanel -->
+  <div id="periodicPanel" hidden="">
+    <section aria-label="بيانات البيان الدوري">
+      <h2>بيانات البيان الدوري</h2>
+      <div class="grid">
+        <label>نوع البيان<select id="pTargetType"><option value="vessel">مركب</option><option value="warehouse">مخزن / ساحة</option></select></label>
+        <label>الوردية<select id="pShift"><option value="نهاري">نهارية</option><option value="ليلي">ليلية</option></select></label>
+        <label class="full">اسم المركب / المخزن / الساحة<input id="pVessel" placeholder="اكتب اسم المركب أو رقم المخزن"></label>
+        <label>العميل<input id="pClient" placeholder="اسم العميل"></label>
+        <label>نوع البضاعة<input id="pCargo" placeholder="نوع البضاعة"></label>
+        <label>تاريخ الوردية<input id="pDate" readonly=""></label>
+        <label id="pHoldsL">عدد العنابر<input id="pHolds" type="text" inputmode="numeric" autocomplete="off" placeholder="مثال: 5"></label>
+        <label>رقم التحديث<input id="pNext" readonly=""></label>
+      </div>
+      <p class="hint" id="pTargetHint">في وضع المركب تُسحب البيانات تلقائيًا من بيان نهاية الوردية. ويمكنك اختيار مخزن / ساحة لإعداد بيان مستقل.</p>
+    </section>
+    <section id="whWork" aria-label="نوع العمل بالمخزن" hidden>
+      <h2>نوع العمل بالمخزن <small id="whWorkTot"></small></h2>
+      <div class="tabs" id="whTypes" role="tablist" aria-label="نوع العمل"></div>
+      <div id="whWorkBody" style="display:flex;flex-direction:column;gap:10px"></div>
+      <button type="button" id="whAdd">+ إضافة مركب</button>
+    </section>
+    <section id="factoriesPer" aria-label="مصانع العلف" hidden>
+      <h2>مصانع العلف <small>كل مصنع في عنبر</small></h2>
+      <div class="fac-list" style="display:flex;flex-direction:column;gap:10px"></div>
+      <button type="button" class="addFactory">+ إضافة مصنع</button>
+    </section>
+    <section aria-label="معدات المركب">
+      <h2>المعدات العاملة</h2>
+      <div id="periodicEquipment" class="periodic-grid"></div>
+    </section>
+    <section aria-label="عدد النقلات">
+      <h2>بيان عدد النقلات</h2>
+      <label>عدد النقلات (للمخزن أو المركب)<input id="pTransferCount" type="number" min="0" step="1" inputmode="numeric" placeholder="اكتب إجمالي عدد النقلات"></label>
+      <p class="hint">اكتب إجمالي النقلات المنفذة في هذا التحديث، سواء كانت داخل المخزن / الساحة أو على المركب.</p>
+    </section>
+    <section aria-label="المقاولون والقلابات">
+      <h2>المقاولون والقلابات والفرش</h2>
+      <div id="periodicContractors" style="display:flex;flex-direction:column;gap:10px"></div>
+      <button type="button" id="addContractor">+ إضافة مقاول قلابات / فرش</button>
+      <div class="note"><strong>عمالة التشغيل</strong><span>يمكن إضافة مقاول عمالة وعدد العمال في كل تحديث</span></div>
+      <button type="button" id="addLaborContractor">+ إضافة مقاول عمالة</button>
+    </section>
+    <section aria-label="ملاحظات التحديث الدوري">
+      <h2>ملاحظات التحديث</h2>
+      <label>بيان / ملاحظات<textarea id="pNote" placeholder="اكتب أي ملاحظات خاصة بالتحديث الحالي..."></textarea></label>
+      <button type="button" class="primary" id="savePeriodic">حفظ التحديث الحالي</button>
+      <p class="hint">كل ضغطة تحفظ نسخة مستقلة بتاريخ ووقت الحفظ. تقدر تسجل 5 أو 6 تحديثات أو أكثر خلال الوردية.</p>
+    </section>
+    <section aria-label="التحديثات المحفوظة">
+      <h2>التحديثات المحفوظة <small id="periodicCount">0 تحديث</small></h2>
+      <div id="periodicUpdates" class="update-list"><p class="hint">لم يتم حفظ أي تحديث لهذه المركب بعد.</p></div>
+      <div id="periodicPreview" class="periodic-preview" hidden=""></div>
+    </section>
+  </div><!-- periodicPanel -->
+</div>
+
+<div class="bottom"><div class="in">
+  <button id="exportExcel" type="button">تصدير Excel</button>
+  <button class="primary" id="make">إنشاء الصورة</button>
+</div></div>
+
+<div class="modal" id="modal" hidden="" role="dialog" aria-modal="true" aria-label="صورة البيان">
+  <div class="sheet">
+    <img id="preview" alt="صورة بيان المركب">
+    <p class="hint" id="hint">اضغط «إرسال على واتساب». إذا كان المتصفح يدعم مشاركة الصور ستظهر قائمة المشاركة؛ وإلا سيتم تنزيل الصورة لإرفاقها يدويًا في واتساب.</p>
+    <div class="row">
+      <button class="primary" id="share">إرسال على واتساب</button>
+      <button id="copyImg">نسخ الصورة</button>
+      <button id="closeModal">رجوع للتعديل</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="historyModal" hidden="" role="dialog" aria-modal="true" aria-label="تفاصيل الوردية المحفوظة">
+  <div class="sheet">
+    <h2 id="historyTitle" style="margin:0">تفاصيل الوردية</h2>
+    <div id="historyDetails" class="hint" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="row">
+      <button class="primary" id="restoreHistory">استعادة الوردية للنموذج</button>
+      <button id="closeHistory">إغلاق</button>
+    </div>
+    <p class="hint">الاستعادة تنقل بيانات الوردية المختارة إلى النموذج الحالي؛ سجل الورديات المحفوظة يظل موجودًا.</p>
+  </div>
+</div>
+<div class="modal" id="settingsModal" hidden="" role="dialog" aria-modal="true" aria-label="إعدادات الموظف">
+  <div class="sheet">
+    <h2 style="margin:0">إعدادات الموظف</h2>
+    <label>اسم الموظف / مُعِد البيان
+      <input id="settingsUser" type="text" autocomplete="name" placeholder="اكتب اسم الموظف">
+    </label>
+    <p class="hint">سيتم حفظ الاسم على نفس الجهاز، وسيظهر تلقائيًا في أسفل صورة بيان نهاية الوردية.</p>
+    <div class="row">
+      <button type="button" class="primary" id="saveSettings">حفظ الإعدادات</button>
+      <button type="button" id="closeSettings">إغلاق</button>
+    </div>
+  </div>
+</div>
+<div class="modal" id="confirmModal" hidden="" role="dialog" aria-modal="true" aria-label="تأكيد">
+  <div class="sheet">
+    <p id="confirmText" style="margin:0;font-size:16px"></p>
+    <div class="row">
+      <button class="primary" id="confirmYes" type="button">نعم، متابعة</button>
+      <button id="confirmNo" type="button">إلغاء</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden=""></div>
+<div id="installTip" hidden style="position:fixed;left:12px;right:12px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:30;background:#0f2d44;color:#fff;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.6;box-shadow:0 6px 24px #0006">لتثبيت الأداة على موبايلك: اضغط زر المشاركة في Safari ثم «إضافة إلى الشاشة الرئيسية».<button type="button" id="installTipClose" style="margin-inline-start:10px;min-height:32px;padding:0 12px">تم</button></div>
+
+<script>
+(function(){
+  var PRISTINE='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+  function isIOS(){return /iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
+  // Save/share a blob on every platform: Web Share (files) -> viewer downloads capability -> iOS new tab -> <a download>.
+  async function saveBlob(blob,name,type){
+    var file=null;try{file=new File([blob],name,{type:type});}catch(e){}
+    try{if(file&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return 'shared';}}
+    catch(e){if(e&&e.name==='AbortError')return 'cancelled';}
+    window.__dlErr='no-claude-runtime';
+    try{var dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null;if(dl){await dl.save({filename:name,data:blob});return 'saved';}window.__dlErr='downloads-null';}
+    catch(e){if(e&&e.code==='declined')return 'cancelled';window.__dlErr=(e&&(e.code||e.message))||String(e);}
+    var url=URL.createObjectURL(blob);
+    if(isIOS()){var w=null;try{w=window.open(url,'_blank');}catch(e){}if(w)return 'opened';location.href=url;return 'opened';}
+    var a=document.createElement('a');a.href=url;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();
+    setTimeout(function(){try{a.remove();URL.revokeObjectURL(url);}catch(e){}},60000);
+    return 'downloaded';
+  }
+  var KEY='bayan-markeb-v1';
+  var EQ=[['ship','مركب'],['cranesWorking','أوناش عاملة'],['handler','هاندلر'],['bri','بري'],['hose','خرطوم'],['belt','سيور'],['gen','مولد']];
+  var EQT=['أوناش عاملة','ونش','هاندلر','بري','خرطوم','سيور','مولد'];
+  var OTH=['سوء أحوال جوية','توقف الهيئة','توقف شفت','عدم توفر بضاعة','انتظار سيارات','انقطاع كهرباء','توقف طوال الوردية','رطوبة','أخرى'];
+  var $=function(i){return document.getElementById(i);};
+  var store={vessels:{},cur:null,user:'',example:true,periodicStandalone:null};
+  var st=null, saveT=null;
+
+  function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function uid(){return 'v'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+  function blank(){return {id:uid(),name:'',client:'',cargo:'',qty:'',berth:'',total:'',cur:'',stores:[{type:'مخزن',name:''}],op:'تفريغ',shift:'نهاري',date:today(),eq:{ship:0,cranesWorking:0,handler:0,bri:0,hose:0,belt:0},eqContractors:{},prev:'',day:'',night:'',stops:[],noteD:'',noteN:'',laborContractor:'',laborCount:'',history:[],holds:'',factories:[]};}
+  function sample(){var s=blank();s.name='MV EXAMPLE';s.client='شركة مثال للتجارة';s.cargo='ذرة صب';s.qty='30000';s.berth='12';s.stores=[{type:'مخزن',name:'5'},{type:'ساحة',name:'الميناء النهري'}];s.eq={ship:2,cranesWorking:0,handler:1,bri:2,hose:0,belt:0};s.total='14900';s.cur='2400';
+    s.stops=[];s.noteD='يومي تخزين 85 قلاب\nإجمالي تخزين 410 قلاب';s.noteN='يومي تخزين 62 قلاب';return s;}
+
+  function num(v){
+    if(v==null)return 0;
+    var s=String(v).replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);}).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d);}).replace(/٫/g,'.').replace(/[,،\s]/g,'');
+    var n=parseFloat(s);return isFinite(n)?n:0;
+  }
+  function fmt(n){if(!isFinite(n))return '0';var r=Math.round(n*1000)/1000;return r.toLocaleString('en-US',{maximumFractionDigits:3});}
+  function calc(){
+    var q=num(st.qty),t=num(st.total),c=num(st.cur);
+    return {q:q,tot:t,cur:c,rem:q-t};
+  }
+  function dur(x){
+    if(x.from&&x.to){var a=x.from.split(':'),b=x.to.split(':');var m=(+b[0]*60+ +b[1])-(+a[0]*60+ +a[1]);if(m<0)m+=1440;return m/60;}
+    return num(x.hrs);
+  }
+  function hm(h){var m=Math.round(h*60),a=Math.floor(m/60),b=m%60;return (a?a+' ساعة':'')+(a&&b?' و':'')+(b?b+' دقيقة':'')||'0';}
+  function hasNight(){return st.shift==='ليلي';}
+
+  function load(){
+    try{var r=localStorage.getItem(KEY);if(r){var o=JSON.parse(r);if(o&&o.vessels){store=o;if(!store.periodicStandalone)store.periodicStandalone=null;}}}catch(e){}
+    if(!store.cur||!store.vessels[store.cur]){
+      var s=sample();store.vessels[s.id]=s;store.cur=s.id;store.example=true;
+    }
+    st=store.vessels[store.cur];
+    // Remove legacy blank rows that were accidentally initialized as a crane stoppage.
+    if(Array.isArray(st.stops))st.stops=st.stops.filter(function(x){return !(x&&x.equip==='ونش'&&!String(x.no||'').trim()&&!String(x.from||'').trim()&&!String(x.to||'').trim());});
+    if(!st.shift)st.shift='نهاري';
+    if(st.total===undefined){var pp=num(st.prev),dd=num(st.day),nn=num(st.night);st.total=String(st.shift==='ليلي'?pp+dd+nn:pp+dd);st.cur=String(st.shift==='ليلي'?nn:dd);}
+    if(!st.stores)st.stores=st.store?[{type:'مخزن',name:st.store}]:[{type:'مخزن',name:''}];
+    if(!Array.isArray(st.factories))st.factories=[];if(st.holds===undefined)st.holds='';
+    if(!Array.isArray(st.history))st.history=[];if(!st.eqContractors)st.eqContractors={};
+  }
+  function save(){
+    clearTimeout(saveT);
+    saveT=setTimeout(function(){try{store.vessels[st.id]=st;localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}},250);
+  }
+
+  function askConfirm(msg,onYes){$('confirmText').textContent=msg;$('confirmModal').hidden=false;$('confirmYes').onclick=function(){$('confirmModal').hidden=true;onYes();};$('confirmNo').onclick=function(){$('confirmModal').hidden=true;};}
+  function toast(t){var e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){e.hidden=true;},2600);}
+
+  function renderChips(){
+    var box=$('chips');box.textContent='';
+    var ids=Object.keys(store.vessels);
+    $('vcount').textContent=ids.length+' محفوظ';
+    ids.forEach(function(id){
+      var v=store.vessels[id],b=document.createElement('button');
+      b.className='chip';b.type='button';b.textContent=v.name||'بدون اسم';b.setAttribute('aria-pressed',id===st.id?'true':'false');
+      b.addEventListener('click',function(){switchTo(id);});box.appendChild(b);
+    });
+  }
+  function switchTo(id){store.cur=id;st=store.vessels[id];store.example=!!st.isExample;renderAll();try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+
+  function renderEq(){
+    var box=$('eq');box.textContent='';
+    EQ.forEach(function(e){
+      var d=document.createElement('div');
+      var lab=document.createElement('span');lab.textContent=e[1];
+      var n=document.createElement('div');n.className='n';
+      var plus=document.createElement('button');plus.type='button';plus.textContent='+';plus.setAttribute('aria-label','زيادة '+e[1]);
+      var inp=document.createElement('input');inp.type='text';inp.inputMode='numeric';inp.value=st.eq[e[0]]||0;inp.setAttribute('aria-label','عدد '+e[1]);
+      var minus=document.createElement('button');minus.type='button';minus.textContent='−';minus.setAttribute('aria-label','إنقاص '+e[1]);
+      function set(v){v=Math.max(0,Math.min(99,Math.round(v)));st.eq[e[0]]=v;inp.value=v;save();}
+      plus.addEventListener('click',function(){set((st.eq[e[0]]||0)+1);});
+      minus.addEventListener('click',function(){set((st.eq[e[0]]||0)-1);});
+      inp.addEventListener('input',function(){st.eq[e[0]]=Math.max(0,Math.min(99,Math.round(num(inp.value))));save();});
+      n.appendChild(plus);n.appendChild(inp);n.appendChild(minus);d.appendChild(lab);d.appendChild(n);
+      var co=document.createElement('input');co.type='text';co.placeholder='اسم الشركة / المقاول';co.value=(st.eqContractors[e[0]]||'');co.setAttribute('aria-label','شركة أو مقاول '+e[1]);co.style.marginTop='6px';co.addEventListener('input',function(){st.eqContractors[e[0]]=co.value;save();});d.appendChild(co);
+      box.appendChild(d);
+    });
+  }
+
+  function renderStops(){
+    var box=$('stops');box.textContent='';
+    st.stops.forEach(function(s,i){
+      if(s.shift!==st.shift)return;
+      var row=document.createElement('div');row.className='stop';
+      function mk(label,el,cls){var l=document.createElement('label');l.textContent=label;if(cls)l.className=cls;l.appendChild(el);return l;}
+      var eqs=document.createElement('select');
+      var emptyOpt=document.createElement('option');emptyOpt.value='';emptyOpt.textContent='اختر نوع التوقف';eqs.appendChild(emptyOpt);
+      [['معدات',EQT],['أسباب أخرى',OTH]].forEach(function(g){var og=document.createElement('optgroup');og.label=g[0];g[1].forEach(function(x){var o=document.createElement('option');o.value=x;o.textContent=x;if(s.equip===x)o.selected=true;og.appendChild(o);});eqs.appendChild(og);});
+      eqs.value=s.equip||'';
+      var no=document.createElement('input');no.type='text';no.inputMode='text';no.autocomplete='off';no.placeholder='رقم المعدة / اسم المقاول';no.value=s.no||'';
+      function makeTimeSelect(value){
+        var inp=document.createElement('input');
+        inp.type='text';inp.readOnly=true;inp.inputMode='none';inp.style.cursor='pointer';
+        inp.placeholder='اضغط لاختيار الوقت';
+        inp.setAttribute('aria-label','اختيار الساعة من القرص الدائري');
+        function display(v){if(!v)return '';var a=String(v).split(':');return String(Number(a[0])).padStart(2,'0')+':'+String(a[1]||'00').padStart(2,'0');}
+        inp.value=display(value);inp.dataset.value=value||'';
+        inp.addEventListener('click',function(){if(!inp.disabled)openClockPicker(inp);});
+        function openClockPicker(target){
+          var current=target.dataset.value||'',parts=current.split(':'),hour=Number(parts[0]||0),minute=Number(parts[1]||0);
+          var selectedHour=hour===0?24:hour,stage='hour';
+          var overlay=document.createElement('div');overlay.className='clock-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');
+          var panel=document.createElement('div');panel.className='clock-panel';
+          var title=document.createElement('div');title.className='clock-title';
+          var heading=document.createElement('span');heading.textContent='اختر الساعة';
+          var chosen=document.createElement('span');chosen.textContent=current?display(current):'--:--';chosen.style.color='var(--accent)';chosen.style.fontVariantNumeric='tabular-nums';
+          title.appendChild(heading);title.appendChild(chosen);panel.appendChild(title);
+          var face=document.createElement('div');face.className='clock-face';panel.appendChild(face);
+          var mins=document.createElement('div');mins.className='clock-minutes';
+          var minus=document.createElement('button');minus.type='button';minus.className='minute-step';minus.textContent='−';minus.setAttribute('aria-label','تقليل دقيقة');
+          var minuteDisplay=document.createElement('button');minuteDisplay.type='button';minuteDisplay.textContent=String(minute).padStart(2,'0');minuteDisplay.disabled=true;minuteDisplay.style.minWidth='74px';
+          var plus=document.createElement('button');plus.type='button';plus.className='minute-step';plus.textContent='+';plus.setAttribute('aria-label','زيادة دقيقة');
+          minus.addEventListener('click',function(){minute=(minute+59)%60;refreshMinute();});
+          plus.addEventListener('click',function(){minute=(minute+1)%60;refreshMinute();});
+          mins.appendChild(minus);mins.appendChild(minuteDisplay);mins.appendChild(plus);
+          function refreshChosen(){chosen.textContent=String(selectedHour).padStart(2,'0')+':'+String(minute).padStart(2,'0');}
+          function refreshMinute(){minuteDisplay.textContent=String(minute).padStart(2,'0');refreshChosen();Array.prototype.forEach.call(face.querySelectorAll('.clock-num'),function(x){x.setAttribute('aria-pressed',String(Number(x.dataset.minute)===minute));});}
+          function renderFace(){
+            face.classList.add('flip');
+            setTimeout(function(){
+              face.textContent='';
+              var center=document.createElement('div');center.className='clock-center';
+              var big=document.createElement('span');big.textContent=stage==='hour'?String(selectedHour).padStart(2,'0'):String(minute).padStart(2,'0');
+              var small=document.createElement('small');small.textContent=stage==='hour'?'ساعة':'دقيقة';center.appendChild(big);center.appendChild(small);face.appendChild(center);
+              if(stage==='hour'){
+                for(var n=1;n<=24;n++)(function(num){var b=document.createElement('button');b.type='button';b.className='clock-num'+(num>12?' inner':'');b.textContent=String(num);b.setAttribute('aria-pressed',String(num===selectedHour));
+                  var ang=((num-1)%12)*Math.PI/6-Math.PI/2;var radius=num>12?29:42;b.style.left=(50+Math.cos(ang)*radius)+'%';b.style.top=(50+Math.sin(ang)*radius)+'%';
+                  b.addEventListener('click',function(){selectedHour=num;stage='minute';heading.textContent='اختر الدقائق';refreshChosen();renderFace();});face.appendChild(b);
+                })(n);
+              }else{
+                for(var m=0;m<60;m+=5)(function(val){var b=document.createElement('button');b.type='button';b.className='clock-num';b.textContent=String(val).padStart(2,'0');b.dataset.minute=String(val);b.setAttribute('aria-pressed',String(val===minute));
+                  var ang=(val/5)*Math.PI/6-Math.PI/2;b.style.left=(50+Math.cos(ang)*40)+'%';b.style.top=(50+Math.sin(ang)*40)+'%';
+                  b.addEventListener('click',function(){minute=val;refreshMinute();renderFace();});face.appendChild(b);
+                })(m);
+              }
+              face.classList.remove('flip');
+            },100);
+          }
+          panel.appendChild(mins);
+          var hint=document.createElement('div');hint.className='clock-hint';hint.textContent='اختر الساعة، ثم الدقائق من القرص (كل 5 دقائق) أو استخدم + و− لضبط الدقيقة بدقة';panel.appendChild(hint);
+          var actions=document.createElement('div');actions.className='clock-actions';var back=document.createElement('button');back.type='button';back.textContent='رجوع للساعة';var cancel=document.createElement('button');cancel.type='button';cancel.textContent='إلغاء';var ok=document.createElement('button');ok.type='button';ok.className='primary';ok.textContent='تأكيد';
+          back.addEventListener('click',function(){stage='hour';heading.textContent='اختر الساعة';renderFace();});
+          cancel.addEventListener('click',function(){overlay.remove();});
+          ok.addEventListener('click',function(){var shownHour=selectedHour||24,storedHour=shownHour%24;var val=String(storedHour).padStart(2,'0')+':'+String(minute).padStart(2,'0');target.value=String(shownHour).padStart(2,'0')+':'+String(minute).padStart(2,'0');target.dataset.value=val;target.dispatchEvent(new Event('change',{bubbles:true}));overlay.remove();});
+          actions.appendChild(back);actions.appendChild(cancel);actions.appendChild(ok);panel.appendChild(actions);overlay.appendChild(panel);overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove();});document.body.appendChild(overlay);renderFace();refreshMinute();
+        }
+        return inp;
+      }
+      var tf=makeTimeSelect(s.from||'');
+      var tt=makeTimeSelect(s.to||'');
+      var rs=document.createElement('input');rs.type='text';rs.value=s.reason||'';rs.placeholder='مثال: مطر غزير، تغيير كباش';
+      var del=document.createElement('button');del.type='button';del.className='del danger ghost';del.textContent='حذف';
+      var fullNote=document.createElement('div');fullNote.textContent='يُحسب تلقائيًا 12 ساعة كاملة';fullNote.style.gridColumn='1 / -1';fullNote.style.fontWeight='700';fullNote.style.color='var(--warn)';
+      function vis(){
+        var other=OTH.indexOf(s.equip)>-1;
+        var isEquipment=EQT.indexOf(s.equip)>-1;
+        var fullShift=s.equip==='توقف طوال الوردية';
+        noL.hidden=!isEquipment;eL.style.gridColumn=(!isEquipment)?'1 / -1':'';
+        if(other){s.no='';no.value='';}
+        tf.disabled=fullShift;tt.disabled=fullShift;fullNote.hidden=!fullShift;
+        tf.style.opacity=fullShift?'.55':'';tt.style.opacity=fullShift?'.55':'';
+        if(fullShift){s.from='';s.to='';s.hrs=12;tf.value='';tt.value='';}
+        else if(s.hrs===12 && s.equip!=='توقف طوال الوردية'){s.hrs=0;}
+      }
+      eqs.addEventListener('change',function(){s.equip=eqs.value||'';if(EQT.indexOf(s.equip)<0)s.no='';no.value=s.no||'';vis();updateStopTot();save();});
+      no.addEventListener('input',function(){s.no=no.value;save();});
+      tf.addEventListener('change',function(){s.from=tf.dataset.value||'';updateStopTot();save();});
+      tt.addEventListener('change',function(){s.to=tt.dataset.value||'';updateStopTot();save();});
+      rs.addEventListener('input',function(){s.reason=rs.value;save();});
+      del.addEventListener('click',function(){st.stops.splice(i,1);renderStops();save();});
+      var eL=mk('نوع التوقف',eqs),noL=mk('رقم المعدة / المقاول',no,'half');row.appendChild(eL);row.appendChild(noL);row.appendChild(mk('بداية التوقف',tf,'half'));row.appendChild(mk('نهاية التوقف',tt,'half'));
+      row.appendChild(fullNote);
+      row.appendChild(mk('التفاصيل',rs,'wide'));row.appendChild(del);vis();
+      box.appendChild(row);
+    });
+    updateStopTot();
+  }
+  function updateStopTot(){
+    var ss=st.stops.filter(function(s){return s.shift===st.shift&&String(s.equip||'').trim();});
+    var t=ss.reduce(function(a,s){return a+dur(s);},0);
+    $('stopTot').textContent=ss.length?(ss.length+' توقف — '+hm(t)):'لا توجد توقفات';
+  }
+
+  function refreshCalc(){
+    var c=calc();
+    $('remAll').value=fmt(c.rem);
+    $('remAll').style.color=c.rem<0?'var(--warn)':'';
+    var pct=c.q>0?Math.max(0,Math.min(100,c.tot/c.q*100)):0;
+    $('barFill').style.width=pct+'%';
+    $('pct').textContent=(Math.round(pct*10)/10)+'%';
+    $('barTxt').textContent=c.q>0?(fmt(c.tot)+' من '+fmt(c.q)+' طن'):'اكتب الكمية الكلية';
+  }
+
+  function applyShift(){
+    var n=st.shift==='ليلي';
+    document.querySelectorAll('[data-shift]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-shift')===st.shift?'true':'false');});
+    $('curT').textContent=n?'كمية الوردية الليلية الحالية':'كمية الوردية النهارية الحالية';
+    $('lNoteD').hidden=n;$('lNoteN').hidden=!n;
+    renderStops();
+  }
+  document.querySelectorAll('[data-shift]').forEach(function(b){b.addEventListener('click',function(){st.shift=b.getAttribute('data-shift');applyShift();refreshCalc();save();});});
+  function storeText(){return st.stores.filter(function(x){return x.name.trim();}).map(function(x){return x.type+' '+x.name.trim();}).join(' • ');}
+  function renderStores(){
+    var box=$('stores');box.textContent='';
+    if(!st.stores.length)st.stores.push({type:'مخزن',name:''});
+    st.stores.forEach(function(r,i){
+      var row=document.createElement('div');row.className='srow';
+      var t=document.createElement('select');t.setAttribute('aria-label','النوع');
+      ['مخزن','ساحة'].forEach(function(x){var o=document.createElement('option');o.value=x;o.textContent=x;if(r.type===x)o.selected=true;t.appendChild(o);});
+      var n=document.createElement('input');n.type='text';n.autocomplete='off';n.value=r.name;n.placeholder=r.type==='ساحة'?'اسم الساحة':'رقم المخزن';n.setAttribute('aria-label','رقم أو اسم');
+      var d=document.createElement('button');d.type='button';d.className='danger ghost';d.textContent='حذف';d.setAttribute('aria-label','حذف');
+      t.addEventListener('change',function(){r.type=t.value;n.placeholder=r.type==='ساحة'?'اسم الساحة':'رقم المخزن';save();});
+      n.addEventListener('input',function(){r.name=n.value;save();});
+      d.addEventListener('click',function(){st.stores.splice(i,1);renderStores();save();});
+      row.appendChild(t);row.appendChild(n);if(st.stores.length>1)row.appendChild(d);else row.style.gridTemplateColumns='110px 1fr';
+      box.appendChild(row);
+    });
+  }
+  $('addStore').addEventListener('click',function(){st.stores.push({type:'مخزن',name:''});renderStores();save();var ins=$('stores').querySelectorAll('input');if(ins.length)ins[ins.length-1].focus();});
+  function renderForm(){
+    ['name','client','cargo','qty','berth','date','total','cur','noteD','noteN','laborContractor','laborCount','holds'].forEach(function(k){$(k).value=st[k]||'';});
+    $('user').value=store.user||'';
+    document.querySelectorAll('[data-op]').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-op')===st.op?'true':'false');});
+    renderEq();renderStores();applyShift();refreshCalc();renderFactories();
+    $('exampleNote').hidden=!st.isExample;
+  }
+  var selectedHistoryIndex=-1;
+  function renderHistory(){
+    var list=$('historyList');list.textContent='';
+    var hs=Array.isArray(st.history)?st.history:[];
+    $('historyCount').textContent='الورديات المحفوظة: '+hs.length;
+    if(!hs.length){var p=document.createElement('p');p.className='hint';p.textContent='لا توجد ورديات محفوظة لهذا المركب حتى الآن.';list.appendChild(p);return;}
+    hs.slice().reverse().forEach(function(h,revIndex){
+      var index=hs.length-1-revIndex,row=document.createElement('div');row.className='history-item';
+      var meta=document.createElement('div');meta.className='meta';
+      var strong=document.createElement('strong');strong.textContent=(h.shift||'وردية')+' — '+(h.op||'');
+      var small=document.createElement('small');small.textContent=(h.date||'بدون تاريخ')+' | '+(h.name||st.name||'المركب')+' | كمية الوردية: '+(h.cur||'0')+' طن';
+      meta.appendChild(strong);meta.appendChild(small);
+      var btn=document.createElement('button');btn.type='button';btn.textContent='فتح';btn.addEventListener('click',function(){openHistory(index);});
+      row.appendChild(meta);row.appendChild(btn);list.appendChild(row);
+    });
+  }
+  function openHistory(index){
+    var h=(st.history||[])[index];if(!h)return;selectedHistoryIndex=index;
+    $('historyTitle').textContent=(h.name||st.name||'المركب')+' — '+(h.shift||'');
+    var d=$('historyDetails');d.textContent='';
+    function line(label,value){var p=document.createElement('p');p.style.margin='0';var b=document.createElement('strong');b.textContent=label+': ';p.appendChild(b);p.appendChild(document.createTextNode(value==null||value===''?'—':String(value)));d.appendChild(p);}
+    line('التاريخ',h.date);line('العملية',h.op);line('العميل',h.client);line('البضاعة',h.cargo);line('الكمية الكلية',h.qty+' طن');line('الإجمالي التراكمي',h.total+' طن');line('كمية الوردية',h.cur+' طن');line('الرصيف',h.berth);line('عدد العنابر',h.holds);if((h.factories||[]).length)line('مصانع العلف',h.factories.map(function(f){return (f.name||'—')+(f.hold?' (عنبر '+f.hold+')':'');}).join('، '));
+    line('المخازن والساحات',(h.stores||[]).map(function(x){return x.type+' '+x.name;}).join('، '));
+    line('المعدات',EQ.filter(function(e){return (h.eq&&Number(h.eq[e[0]]||0)>0)||(h.eqContractors&&String(h.eqContractors[e[0]]||'').trim());}).map(function(e){return e[1]+': '+h.eq[e[0]]+(h.eqContractors&&h.eqContractors[e[0]]?' — '+h.eqContractors[e[0]]:'');}).join('، '));
+    line('التوقفات',(h.stops||[]).map(function(x){return [x.equip,x.no,x.reason,x.from&&x.to?(x.from+' إلى '+x.to):''].filter(Boolean).join(' - ');}).join(' | '));
+    line('اسم مقاول العمالة',h.laborContractor);line('عدد العمال',h.laborCount);line('البيان',h.note);$('historyModal').hidden=false;
+  }
+  $('closeHistory').addEventListener('click',function(){$('historyModal').hidden=true;});
+  $('restoreHistory').addEventListener('click',function(){
+    var h=(st.history||[])[selectedHistoryIndex];if(!h)return;
+    askConfirm('سيتم تحميل بيانات الوردية المحفوظة إلى النموذج الحالي. سيتم استبدال بيانات النموذج الحالية. هل تريد المتابعة؟',function(){
+    st.date=h.date||today();st.shift=h.shift||'نهاري';st.op=h.op||'تفريغ';st.total=h.total||'';st.cur=h.cur||'';
+    st.qty=h.qty||st.qty||'';st.name=h.name||st.name;st.client=h.client||'';st.cargo=h.cargo||'';st.berth=h.berth||'';
+    st.stores=JSON.parse(JSON.stringify(h.stores||[]));if(!st.stores.length)st.stores=[{type:'مخزن',name:''}];
+    st.eq=JSON.parse(JSON.stringify(h.eq||{}));st.eqContractors=JSON.parse(JSON.stringify(h.eqContractors||{}));st.stops=JSON.parse(JSON.stringify(h.stops||[]));
+    st.noteD=h.shift==='نهاري'?(h.note||''):'';st.noteN=h.shift==='ليلي'?(h.note||''):'';st.laborContractor=h.laborContractor||'';st.laborCount=h.laborCount||'';st.holds=h.holds||'';st.factories=JSON.parse(JSON.stringify(h.factories||[]));
+    $('historyModal').hidden=true;renderAll();save();toast('تم استعادة الوردية المحفوظة إلى النموذج.');window.scrollTo(0,0);
+    });
+  });
+  // ---------- Periodic equipment report ----------
+  function periodicDefault(){return {equipment:{},contractors:[],note:'',updates:[]};}
+  function periodicTarget(){return $('pTargetType')&&$('pTargetType').value==='warehouse'?'warehouse':'vessel';}
+  function pData(){if(periodicTarget()==='warehouse'){if(!store.periodicStandalone)store.periodicStandalone=periodicDefault();return store.periodicStandalone;}ensurePeriodic();return st.periodic;}
+  function ensurePeriodic(){if(!st.periodic)st.periodic=periodicDefault();var d=st.periodic;if(!d.equipment)d.equipment={};if(!Array.isArray(d.contractors))d.contractors=[];if(!Array.isArray(d.updates))d.updates=[];}
+  function pSave(){var d=pData();if(!d.equipment)d.equipment={};try{store.vessels[st.id]=st;localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}}
+  var periodicFieldId=0;
+  function pField(parent,label,value,type,placeholder,onInput){
+    var field=document.createElement('div');
+    field.className='periodic-field';
+    var l=document.createElement('label');
+    var e=document.createElement(type==='textarea'?'textarea':'input');
+    var id='periodicField_'+(++periodicFieldId);
+    e.id=id;
+    l.htmlFor=id;
+    l.textContent=label;
+    e.value=(value===0||value)?String(value):'';
+    if(placeholder)e.placeholder=placeholder;
+    if(type==='number'){
+      e.type='text';
+      e.inputMode='none';
+      e.readOnly=true;
+      e.value=e.value.trim()===''?'0':e.value;
+      e.setAttribute('aria-label',label+' — استخدم أزرار الزيادة والنقصان');
+      e.setAttribute('aria-live','polite');
+      var wrap=document.createElement('div');
+      wrap.className='periodic-stepper';
+      var minus=document.createElement('button');
+      minus.type='button';minus.textContent='−';minus.setAttribute('aria-label','تقليل '+label);
+      minus.className='periodic-minus';
+      var plus=document.createElement('button');
+      plus.type='button';plus.textContent='+';plus.setAttribute('aria-label','زيادة '+label);
+      plus.className='periodic-plus';
+      e.addEventListener('input',function(){
+        if(typeof onInput==='function')onInput(e.value);
+        pSave();
+      });
+      function change(delta,ev){
+        if(ev){ev.preventDefault();ev.stopPropagation();}
+        var raw=String(e.value||'0').replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);}).replace(/[^0-9-]/g,'');
+        var current=parseInt(raw,10);
+        if(!Number.isFinite(current))current=0;
+        var next=Math.max(0,current+delta);
+        e.value=String(next);
+        e.setAttribute('value',String(next));
+        e.dispatchEvent(new Event('input',{bubbles:true}));
+      }
+      minus.addEventListener('click',function(ev){change(-1,ev);});
+      plus.addEventListener('click',function(ev){change(1,ev);});
+      wrap.appendChild(minus);wrap.appendChild(e);wrap.appendChild(plus);
+      field.appendChild(l);field.appendChild(wrap);
+    }else{
+      e.addEventListener('input',function(){if(typeof onInput==='function')onInput(e.value);pSave();});
+      field.appendChild(l);field.appendChild(e);
+    }
+    parent.appendChild(field);
+    return e;
+  }
+  var P_EQ=[['cranes','أوناش',true],['excavators','حفارات',true],['forklifts','كلاركات',true],['trucks','قلابات',true],['loaders','لوادر',true],['hoppers','هوابر',true],['handlers','هاندلر',true],['tampers','تامبر',true],['drums','درام',true],['belts','سيور',true],['cranesMobile','رافعات',true],['kalmar','كالمر',true],['tagMaster','تاج ماستر',true],['generators','مولد',true]];
+  function renderPeriodic(){
+    ensurePeriodic();var d=pData(),wh=periodicTarget()==='warehouse';$('pVessel').value=wh?(d.entityName||''):(st.name||'');$('pVessel').parentElement.firstChild.textContent=wh?'اسم المخزن / الساحة':'اسم المركب';$('pVessel').placeholder=wh?'اكتب اسم المخزن أو رقم المخزن':'اسم المركب';$('pClient').value=wh?(d.client||''):(st.client||'');$('pCargo').value=wh?(d.cargo||''):(st.cargo||'');$('pClient').parentElement.hidden=false;$('pCargo').parentElement.hidden=false;$('pVessel').readOnly=!wh;$('pClient').readOnly=!wh;$('pCargo').readOnly=!wh;$('pTargetHint').textContent=wh?'بيان خاص بالمخزن / الساحة فقط. جميع المعدات والنقلات المسجلة تخص المخزن، ولا يوجد اختيار مركب.':'بيانات المركب والعميل والبضاعة مرتبطة بتاب نهاية الوردية.';$('periodicEquipment').parentElement.setAttribute('aria-label',wh?'معدات المخزن':'معدات المركب');$('periodicEquipment').parentElement.querySelector('h2').textContent=wh?'المعدات العاملة بالمخزن':'المعدات العاملة';$('pTransferCount').parentElement.firstChild.textContent=wh?'عدد النقلات داخل المخزن / الساحة':'عدد النقلات على المركب';$('pTransferCount').placeholder=wh?'اكتب عدد النقلات داخل المخزن':'اكتب عدد النقلات على المركب';$('pTransferCount').parentElement.parentElement.querySelector('.hint').textContent=wh?'سجل إجمالي النقلات التي تمت داخل المخزن أو الساحة خلال هذا التحديث.':'سجل إجمالي النقلات الخاصة بالمركب خلال هذا التحديث.';$('pDate').value=st.date||today();$('pNext').value=String(nextPeriodicNumber(d.updates));
+    var eb=$('periodicEquipment');eb.textContent='';
+    P_EQ.forEach(function(def){var key=def[0],obj=d.equipment[key]||(d.equipment[key]={count:'',codes:''});if(!Array.isArray(obj.contractors))obj.contractors=obj.contractor?[{name:obj.contractor,count:obj.count||'',codes:obj.codes||''}]:[];if(key==='cranes'&&!obj.crew)obj.crew={};var card=document.createElement('div');card.className='equip-card'+(def[2]?' full':'');var h=document.createElement('h3');h.textContent=def[1];card.appendChild(h);
+      if(key==='cranes'){var craneType=document.createElement('label');craneType.textContent=wh?'نوع الأوناش بالمخزن':'نوع الأوناش العاملة';if(wh){obj.craneType='warehouse';var fixedType=document.createElement('input');fixedType.type='text';fixedType.value='أوناش المخزن';fixedType.readOnly=true;craneType.appendChild(fixedType);}else{var craneSelect=document.createElement('select');[['ship','أوناش مركب'],['land','أوناش بري']].forEach(function(a){var op=document.createElement('option');op.value=a[0];op.textContent=a[1];craneSelect.appendChild(op);});craneSelect.value=obj.craneType==='land'?'land':'ship';craneSelect.addEventListener('change',function(){obj.craneType=craneSelect.value;pSave();});craneType.appendChild(craneSelect);}card.appendChild(craneType);var craneCountBox=document.createElement('div');craneCountBox.className='periodic-grid full';var craneCountInput=pField(craneCountBox,'عدد الأوناش',obj.craneCount||'','text','اكتب عدد الأوناش العاملة',function(v){obj.craneCount=v;});craneCountInput.inputMode='numeric';card.appendChild(craneCountBox);}
+      var contractorBox=document.createElement('div');contractorBox.style.cssText='display:flex;flex-direction:column;gap:8px';
+      function renderEquipmentContractors(){contractorBox.textContent='';obj.contractors.forEach(function(c,i){if(!c.kind)c.kind='contractor';var cg=document.createElement('div');cg.className='contractor-card';var ch=document.createElement('h3');ch.textContent=(c.kind==='company'?'شركة ':'مقاول ')+(i+1)+' — '+def[1];cg.appendChild(ch);var fields=document.createElement('div');fields.className='periodic-grid';var kindWrap=document.createElement('div');kindWrap.className='periodic-field';var kindLabel=document.createElement('label');kindLabel.textContent='الجهة';var kindSelect=document.createElement('select');[['contractor','مقاول'],['company','شركة']].forEach(function(a){var op=document.createElement('option');op.value=a[0];op.textContent=a[1];kindSelect.appendChild(op);});kindSelect.value=c.kind;kindSelect.addEventListener('change',function(){c.kind=kindSelect.value;renderEquipmentContractors();pSave();});kindWrap.appendChild(kindLabel);kindWrap.appendChild(kindSelect);fields.appendChild(kindWrap);pField(fields,c.kind==='company'?'اسم الشركة':'اسم المقاول',c.name,'text',c.kind==='company'?'اكتب اسم الشركة':'اكتب اسم المقاول',function(v){c.name=v;});var countInput=pField(fields,key==='cranes'?'عدد الأوناش':'العدد',c.count,'text',key==='cranes'?'اكتب عدد الأوناش':'اكتب العدد',function(v){c.count=v;});countInput.inputMode='numeric';if(def[2])pField(fields,'أكواد المعدات (كل كود في سطر مستقل)',c.codes,'textarea','اكتب الكود الأول ثم انزل سطرًا للكود التالي',function(v){c.codes=v;});cg.appendChild(fields);var rm=document.createElement('button');rm.type='button';rm.className='danger ghost';rm.textContent='حذف '+(c.kind==='company'?'الشركة':'المقاول');rm.addEventListener('click',function(){obj.contractors.splice(i,1);renderEquipmentContractors();pSave();});cg.appendChild(rm);contractorBox.appendChild(cg);});if(addCo)contractorBox.appendChild(addCo);}
+      var addCo=document.createElement('button');addCo.type='button';addCo.textContent='+ إضافة شركة / مقاول '+def[1];addCo.addEventListener('click',function(){obj.contractors.push({kind:'contractor',name:'',count:'',codes:''});renderEquipmentContractors();pSave();});card.appendChild(contractorBox);renderEquipmentContractors();
+      if(key==='cranes'){var cg2=document.createElement('div');cg2.className='periodic-grid full';pField(cg2,'مقاول طاقم الوناشين',obj.crewContractor,'text','اسم مقاول طاقم الوناشين',function(v){obj.crewContractor=v;});[['cablemen','كبلجية'],['hookmen','هكاكين'],['operators','وناشين'],['signal','عصفورة']].forEach(function(a){pField(cg2,a[1],obj.crew[a[0]],'number','0',function(v){obj.crew[a[0]]=v;});});card.appendChild(cg2);}
+      eb.appendChild(card);
+    });
+    $('pNote').value=d.note||'';$('pTransferCount').value=d.transferCount||'';$('pShift').value=d.shift||st.shift||'نهاري';$('pHolds').value=st.holds||'';$('pHoldsL').hidden=wh;$('pTransferCount').parentElement.parentElement.hidden=wh;renderWork();renderFactories();
+    renderContractors();renderPeriodicUpdates();
+  }
+  function renderContractors(){var box=$('periodicContractors');box.textContent='';var arr=pData().contractors;
+    if(!arr.length){var p=document.createElement('p');p.className='hint';p.textContent='يمكنك إضافة مقاولات القلابات والفرش والعمالة، وتسجيل الشركة أو المقاول داخل بطاقة كل نوع معدة.';box.appendChild(p);}
+    arr.forEach(function(c,i){var card=document.createElement('div');card.className='contractor-card';var h=document.createElement('h3');h.textContent='مقاول '+(i+1);card.appendChild(h);var g=document.createElement('div');g.className='periodic-grid';
+      var l=document.createElement('label');l.textContent='نوع العمل';var sel=document.createElement('select');['قلابات','فرش','عمالة','أعمال أخرى'].forEach(function(x){var o=document.createElement('option');o.value=x;o.textContent=x;if(c.type===x)o.selected=true;sel.appendChild(o);});sel.addEventListener('change',function(){c.type=sel.value;renderContractors();pSave();});l.appendChild(sel);g.appendChild(l);
+      pField(g,'اسم المقاول',c.name,'text','اسم الشركة / المقاول',function(v){c.name=v;});pField(g,c.type==='عمالة'?'عدد العمال':'العدد',c.count,'number','0',function(v){c.count=v;});
+      if(c.type!=='عمالة')pField(g,'أرقام القلابات (كل رقم في سطر)',c.plates,'textarea','مثال: د م أ 1234',function(v){c.plates=v;});card.appendChild(g);
+      var del=document.createElement('button');del.type='button';del.className='danger ghost';del.textContent='حذف المقاول';del.addEventListener('click',function(){arr.splice(i,1);renderContractors();pSave();});card.appendChild(del);box.appendChild(card);
+    });
+  }
+
+  /* ---------- feed factories / holds / warehouse work ---------- */
+  function isFeedText(t){return /علف|أعلاف|اعلاف/.test(String(t||''));}
+  function isFeed(){return isFeedText(st.cargo);}
+  function renderFactories(){
+    if(!Array.isArray(st.factories))st.factories=[];
+    var show=isFeed(),secs=[$('factoriesEnd'),$('factoriesPer')];
+    secs[0].hidden=!show;secs[1].hidden=!(show&&periodicTarget()==='vessel');
+    secs.forEach(function(sec){
+      var box=sec.querySelector('.fac-list');box.textContent='';
+      if(sec.hidden)return;
+      if(!st.factories.length){var p=document.createElement('p');p.className='hint';p.textContent='اضغط «إضافة مصنع» واكتب اسم المصنع ورقم العنبر الخاص به.';box.appendChild(p);}
+      st.factories.forEach(function(f,i){
+        var row=document.createElement('div');row.className='fac-row';
+        var l1=document.createElement('label');l1.textContent='اسم المصنع';var n=document.createElement('input');n.type='text';n.autocomplete='off';n.value=f.name||'';n.placeholder='اسم المصنع';n.addEventListener('input',function(){f.name=n.value;save();});l1.appendChild(n);
+        var l2=document.createElement('label');l2.textContent='رقم العنبر';var h=document.createElement('input');h.type='text';h.inputMode='numeric';h.autocomplete='off';h.value=f.hold||'';h.placeholder='1';h.addEventListener('input',function(){f.hold=h.value;save();});l2.appendChild(h);
+        var d=document.createElement('button');d.type='button';d.className='danger ghost';d.textContent='حذف';d.addEventListener('click',function(){st.factories.splice(i,1);renderFactories();save();});
+        row.appendChild(l1);row.appendChild(l2);row.appendChild(d);box.appendChild(row);
+      });
+    });
+  }
+  var WH_TYPES=[['adjust','ضبط المخزن'],['load','شحن لمركب من المخزن'],['unload','تفريغ من مركب للمخزن'],['shift','شفت من مخزن إلى مخزن']];
+  function workLabel(t){var r=WH_TYPES.filter(function(x){return x[0]===t;})[0];return r?r[1]:'';}
+  function workDefault(){return {type:'adjust',adjust:{trips:'',qty:''},load:[],unload:[],shift:[]};}
+  function ensureWork(d){if(!d.work)d.work=workDefault();var w=d.work;if(!w.adjust)w.adjust={trips:'',qty:''};['load','unload','shift'].forEach(function(k){if(!Array.isArray(w[k]))w[k]=[];});if(!w.type)w.type='adjust';return w;}
+  function whSummary(w){var t=0,q=0;if(w.type==='adjust'){t=num(w.adjust.trips);q=num(w.adjust.qty);}else{(w[w.type]||[]).forEach(function(r){t+=num(r.trips);q+=num(r.qty);});}return {t:t,q:q};}
+  function workSnapshot(d){var w=ensureWork(d),o={type:w.type};if(w.type==='adjust')o.adjust=JSON.parse(JSON.stringify(w.adjust));else o[w.type]=JSON.parse(JSON.stringify(w[w.type]));return o;}
+  function workLines(u){
+    var w=u.work;if(!w)return [];var out=['نوع العمل: '+workLabel(w.type)];
+    if(w.type==='adjust'){out.push('عدد النقلات: '+((w.adjust&&w.adjust.trips)||0)+' — الكمية: '+((w.adjust&&w.adjust.qty)||0)+' طن');}
+    else if(w.type==='shift'){(w.shift||[]).forEach(function(r,i){out.push((i+1)+') من مخزن '+(r.from||'—')+' إلى مخزن '+(r.to||'—')+' — النقلات: '+(r.trips||0)+' — الكمية: '+(r.qty||0)+' طن');});}
+    else{(w[w.type]||[]).forEach(function(r,i){out.push((i+1)+') '+(w.type==='load'?'شحن إلى مركب ':'تفريغ من مركب ')+(r.vessel||'—')+' — النقلات: '+(r.trips||0)+' — الكمية: '+(r.qty||0)+' طن');});}
+    var s=whSummary(w);if(w.type!=='adjust')out.push('الإجمالي: '+fmt(s.t)+' نقلة — '+fmt(s.q)+' طن');
+    return out;
+  }
+  function updateWhTot(){var wd=pData();if(periodicTarget()!=='warehouse')return;var s=whSummary(ensureWork(wd));$('whWorkTot').textContent=(s.t||s.q)?('نقلات '+fmt(s.t)+' — '+fmt(s.q)+' طن'):'';}
+  function renderWork(){
+    var wh=periodicTarget()==='warehouse';$('whWork').hidden=!wh;if(!wh)return;
+    var d=pData(),w=ensureWork(d);
+    var tb=$('whTypes');tb.textContent='';
+    WH_TYPES.forEach(function(tp){var b=document.createElement('button');b.type='button';b.textContent=tp[1];b.setAttribute('aria-pressed',w.type===tp[0]?'true':'false');b.addEventListener('click',function(){w.type=tp[0];pSave();renderWork();});tb.appendChild(b);});
+    var body=$('whWorkBody');body.textContent='';
+    var add=$('whAdd');add.hidden=(w.type==='adjust');add.textContent=w.type==='shift'?'+ إضافة نقل من مخزن إلى مخزن':'+ إضافة مركب';
+    function numField(parent,label,obj,key,dec){var e=pField(parent,label,obj[key],'text',dec?'مثال: 250.5':'0',function(v){obj[key]=v;updateWhTot();});e.inputMode=dec?'decimal':'numeric';return e;}
+    var hints={adjust:'ضبط المخزن: سجل عدد النقلات والكمية.',load:'شحن لمركب من المخزن: اكتب اسم كل مركب مع عدد النقلات والكمية. يمكن إضافة أكثر من مركب.',unload:'تفريغ من المركب إلى المخزن: اكتب اسم كل مركب مع عدد النقلات والكمية. يمكن إضافة أكثر من مركب.',shift:'شفت: اكتب مخزن خروج البضاعة ومخزن دخولها مع عدد النقلات والكمية. يمكن إضافة أكثر من مخزن.'};
+    var hint=document.createElement('p');hint.className='hint';hint.textContent=hints[w.type];body.appendChild(hint);
+    if(w.type==='adjust'){
+      var card=document.createElement('div');card.className='contractor-card';var g=document.createElement('div');g.className='periodic-grid';
+      numField(g,'عدد النقلات',w.adjust,'trips');numField(g,'الكمية (طن)',w.adjust,'qty',true);card.appendChild(g);body.appendChild(card);
+    }else{
+      w[w.type].forEach(function(r,i){
+        var card=document.createElement('div');card.className='contractor-card';var h=document.createElement('h3');h.textContent=(w.type==='shift'?'نقل ':'مركب ')+(i+1);card.appendChild(h);
+        var g=document.createElement('div');g.className='periodic-grid';
+        if(w.type==='shift'){pField(g,'مخزن خروج البضاعة',r.from,'text','رقم / اسم المخزن',function(v){r.from=v;});pField(g,'مخزن دخول البضاعة',r.to,'text','رقم / اسم المخزن',function(v){r.to=v;});}
+        else{pField(g,'اسم المركب',r.vessel,'text','اسم المركب',function(v){r.vessel=v;});}
+        numField(g,'عدد النقلات',r,'trips');numField(g,'الكمية (طن)',r,'qty',true);card.appendChild(g);
+        var del=document.createElement('button');del.type='button';del.className='danger ghost';del.textContent='حذف';del.addEventListener('click',function(){w[w.type].splice(i,1);renderWork();pSave();});card.appendChild(del);body.appendChild(card);
+      });
+    }
+    updateWhTot();
+  }
+  function extraText(u){var o=[];if(u.holds)o.push('عدد العنابر: '+u.holds);if((u.factories||[]).length)o.push('مصانع العلف: '+u.factories.map(function(f){return (f.name||'—')+(f.hold?' (عنبر '+f.hold+')':'');}).join('؛ '));var wl=workLines(u);if(wl.length)o.push(wl.join(' / '));if(u.transferCount!==undefined&&String(u.transferCount).trim()!=='')o.push('إجمالي عدد النقلات: '+u.transferCount);return o.length?o.join(' | ')+' | ':'';}
+  function endExtra(d,v){var o=[];var hd=d.holds!==undefined?d.holds:v.holds;if(hd)o.push('عدد العنابر: '+hd);var fs=d.factories||[];if(!isFeedText(d.cargo||d.cargo2||v.cargo))fs=[];if(fs.length)o.push('مصانع العلف: '+fs.map(function(f){return (f.name||'—')+(f.hold?' (عنبر '+f.hold+')':'');}).join('؛ '));return o.length?o.join(' | ')+' | ':'';}
+  async function drawPeriodicImage(u){
+    try{await Promise.all([document.fonts.load('400 24px Cairo'),document.fonts.load('700 24px Cairo'),document.fonts.load('800 24px Cairo')]);}catch(e){}
+    var W=1080,M=52,C={ink:'#0f2d44',mute:'#5b6b78',line:'#d6dde3',soft:'#f3f6f8',acc:'#c8541a'};
+    var cv=document.createElement('canvas'),ctx=cv.getContext('2d'),y=0,lines=[];
+    function font(w,z){ctx.font=w+' '+z+'px Cairo,Tahoma,Arial,sans-serif';}
+    function text(t,x,yy,w,z,color,align){ctx.direction='rtl';font(w,z);ctx.fillStyle=color;ctx.textAlign=align||'right';ctx.fillText(String(t),x,yy);}
+    function wrap(t,max,w,z){font(w,z);var out=[];String(t||'').split('\n').forEach(function(par){var words=par.split(/\s+/).filter(Boolean),line='';if(!words.length){out.push('');return;}words.forEach(function(word){var next=line?line+' '+word:word;if(ctx.measureText(next).width>max&&line){out.push(line);line=word;}else line=next;});out.push(line);});return out;}
+    function addSection(title){y+=22;ctx.fillStyle=C.ink;ctx.fillRect(M,y,W-2*M,54);text(title,W-M-18,y+37,'700',27,'#ffffff');y+=72;}
+    function addLines(label,value){if(!String(value||'').trim())return;var ls=wrap(label+': '+value,W-2*M-30,'400',27);ls.forEach(function(line){text(line,W-M-12,y+28,'400',27,C.ink);y+=42;});}
+    var equipment=[];P_EQ.forEach(function(d){var z=u.equipment&&u.equipment[d[0]]||{};if((z.contractors||[]).some(function(c){return String(c.name||'').trim()||String(c.count||'').trim()||String(c.codes||'').trim();})||(d[0]==='cranes'&&(String(z.craneCount||'').trim()||Object.values(z.crew||{}).some(function(v){return Number(v)>0;})))){equipment.push({key:d[0],label:d[1],craneType:z.craneType||'ship',contractors:z.contractors||[],crew:z.crew||{},crewContractor:z.crewContractor||'',craneCount:z.craneCount||''});}});
+    var contractors=u.contractors||[];
+    var estimate=390+equipment.length*100+contractors.length*150+(u.note?160:0)+equipment.reduce(function(a,e){var n=(e.contractors||[]).reduce(function(k,c){return k+String(c.codes||'').length;},0);return a+(n?Math.ceil(n/55)*38:0);},0)+contractors.reduce(function(a,c){return a+(c.plates?Math.ceil(c.plates.length/55)*38:0);},0);
+    cv.width=W;cv.height=12000;ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,cv.height);
+    ctx.fillStyle=C.ink;ctx.fillRect(0,0,W,178);
+    text('سيسكو ترانس للوجستيات المتطورة — فرع دمياط',W-M,55,'600',25,'#c9d7e2');
+    text((u.targetType==='warehouse'?'بيان دوري للمخزن / الساحة':'بيان دوري للمعدات'),W-M,122,'800',48,'#ffffff');
+    text('التحديث رقم '+(u.number||''),M,122,'700',28,'#ffffff','left');
+    y=218;
+    ctx.fillStyle='#fff4ec';ctx.fillRect(M,y,W-2*M,112);
+    text(u.name||'—',W-M-18,y+76,'800',58,C.ink);
+    y+=140;
+    var info=[['العميل',u.client],['نوع البضاعة',u.cargo],['التاريخ',u.date],['الوردية',u.shift==='ليلي'?'ليلية':'نهارية'],['عدد العنابر',u.holds],['وقت التحديث',u.savedAt]];
+    info.forEach(function(it){addLines(it[0],it[1]);});
+    if(u.transferCount!==undefined&&String(u.transferCount).trim()!=='')addLines('إجمالي عدد النقلات',u.transferCount);
+    if((u.factories||[]).length){addSection('مصانع العلف (كل مصنع في عنبر)');u.factories.forEach(function(f){wrap('مصنع '+(f.name||'—')+(f.hold?' — عنبر '+f.hold:''),W-2*M-30,'600',27).forEach(function(line){text(line,W-M-12,y+28,'600',27,C.ink);y+=42;});});}
+    if(u.work){addSection('نوع العمل بالمخزن');workLines(u).forEach(function(l){wrap(l,W-2*M-30,'400',27).forEach(function(line){text(line,W-M-12,y+28,'400',27,C.ink);y+=42;});});}
+    addSection('المعدات العاملة على '+(u.targetType==='warehouse'?'المخزن / الساحة':'المركب'));
+    if(!equipment.length){text('لا توجد معدات مسجلة في هذا التحديث',W-M,y+28,'400',26,C.mute);y+=48;}
+    equipment.forEach(function(e){
+      y+=4;ctx.fillStyle='#eaf0f4';ctx.fillRect(M,y,W-2*M,58);
+      text(e.label,W-M-14,y+40,'800',34,C.ink);y+=72;
+      if(e.key==='cranes'){addLines('نوع الأوناش',u.targetType==='warehouse'?'أوناش المخزن':(e.craneType==='land'?'أوناش بري':'أوناش مركب'));addLines('عدد الأوناش',e.craneCount);}(e.contractors||[]).forEach(function(c,i){addLines((c.kind==='company'?'شركة ':'مقاول ')+(i+1),c.name||'—');addLines('العدد',c.count||'—');if(c.codes)addLines('أكواد المعدات',c.codes);});if(e.key==='cranes'){if(e.crewContractor)addLines('مقاول طاقم الوناشين',e.crewContractor);addLines('طاقم الونشين','كبلجية: '+(e.crew.cablemen||0)+' | هكاكين: '+(e.crew.hookmen||0)+' | وناشين: '+(e.crew.operators||0)+' | عصفورة: '+(e.crew.signal||0));}y+=8;
+    });
+    var workContractors=contractors.filter(function(c){return c.type!=='عمالة';});
+    var labor=contractors.filter(function(c){return c.type==='عمالة';});
+    addSection('المقاولون والقلابات والفرش');
+    if(!workContractors.length){text('لا يوجد مقاولون قلابات أو فرش مسجلون',W-M,y+28,'400',26,C.mute);y+=48;}
+    workContractors.forEach(function(c,i){
+      y+=4;ctx.fillStyle='#eaf0f4';ctx.fillRect(M,y,W-2*M,58);
+      text('مقاول '+(i+1)+' — '+(c.type||'أعمال أخرى'),W-M-14,y+40,'800',32,C.ink);y+=72;
+      addLines('اسم المقاول',c.name||'—');
+      addLines(c.type==='قلابات'?'عدد القلابات':'العدد',c.count||'—');
+      if(c.plates)addLines(c.type==='قلابات'?'أرقام القلابات':'الأرقام / التفاصيل',c.plates);
+      y+=10;
+    });
+    addSection('العمالة');
+    if(!labor.length){text('لا توجد عمالة مسجلة في هذا التحديث',W-M,y+28,'400',26,C.mute);y+=48;}
+    labor.forEach(function(c,i){
+      y+=4;ctx.fillStyle='#fff4ec';ctx.fillRect(M,y,W-2*M,58);
+      text('مقاول العمالة '+(i+1),W-M-14,y+40,'800',32,C.acc);y+=72;
+      addLines('اسم المقاول',c.name||'—');
+      addLines('عدد العمال',c.count||'—');y+=10;
+    });
+    if(String(u.note||'').trim()){addSection('ملاحظات التحديث');wrap(u.note,W-2*M,'400',27).forEach(function(line){text(line,W-M,y+28,'400',27,C.ink);y+=42;});}
+    y+=24;ctx.fillStyle=C.line;ctx.fillRect(M,y,W-2*M,2);y+=40;if(u.preparer){text('المُعِد: '+u.preparer,W-M,y,'800',26,C.ink);y+=40;}text('بيان دوري — '+(u.name||''),W-M,y,'600',22,C.mute);text('سيسكو ترانس',M,y,'400',22,C.mute,'left');y+=30;
+    var out=document.createElement('canvas');out.width=W;out.height=y;out.getContext('2d').drawImage(cv,0,0,W,y,0,0,W,y);return out;
+  }
+  async function makePeriodicShare(u){
+    try{toast('جاري تجهيز صورة البيان الدوري...');var cv=await drawPeriodicImage(u);lastBlob=await toBlob(cv);if(!lastBlob)throw new Error('blob');
+      lastName='بيان دوري '+(u.name||'مركب').replace(/[\\/:*?"<>|]/g,'').trim()+' - تحديث '+u.number+' - '+(u.date||today())+'.png';
+      try{lastFile=new File([lastBlob],lastName,{type:'image/png'});}catch(e){lastFile=null;}
+      $('preview').src=cv.toDataURL('image/png');$('hint').textContent='الصورة جاهزة. اضغط «إرسال على واتساب»؛ إذا لم يدعم المتصفح مشاركة الملفات فسيتم تنزيلها لإرفاقها يدويًا في واتساب.';$('modal').hidden=false;$('modal').scrollTop=0;
+    }catch(e){toast('تعذر إنشاء صورة البيان الدوري. حاول مرة أخرى.');}
+  }
+  function periodicText(u){var lines=['بيان دوري للمعدات',((u.targetType==='warehouse'?'المخزن / الساحة: ':'المركب: ')+(u.name||'')),'العميل: '+(u.client||''),'نوع البضاعة: '+(u.cargo||''),'التاريخ: '+(u.date||''),'الوردية: '+(u.shift==='ليلي'?'ليلية':'نهارية'),'وقت التحديث: '+(u.savedAt||''),'التحديث رقم: '+u.number];if(u.transferCount!==undefined&&String(u.transferCount).trim()!=='')lines.push('إجمالي عدد النقلات: '+u.transferCount);if(u.holds)lines.push('عدد العنابر: '+u.holds);(u.factories||[]).forEach(function(f){lines.push('مصنع علف: '+(f.name||'—')+(f.hold?' — عنبر '+f.hold:''));});workLines(u).forEach(function(l){lines.push(l);});if(u.preparer)lines.push('المُعِد: '+u.preparer);lines.push('','المعدات:');
+    P_EQ.forEach(function(d){var x=u.equipment&&u.equipment[d[0]]||{};if((x.contractors||[]).some(function(c){return String(c.name||'').trim()||String(c.count||'').trim()||String(c.codes||'').trim();})||(d[0]==='cranes'&&(String(x.crewContractor||'').trim()||Object.values(x.crew||{}).some(function(v){return Number(v)>0;})))){lines.push(d[1]+(d[0]==='cranes'?' ('+(u.targetType==='warehouse'?'أوناش المخزن':(x.craneType==='land'?'أوناش بري':'أوناش مركب'))+')':''));(x.contractors||[]).forEach(function(c,i){lines.push((c.kind==='company'?'شركة ':'مقاول ')+(i+1)+': '+(c.name||'')+' — العدد: '+(c.count||'0'));if(c.codes)lines.push('أكواد المعدات:\n'+c.codes);});if(d[0]==='cranes'){if(x.crewContractor)lines.push('مقاول طاقم الوناشين: '+x.crewContractor);lines.push('طاقم الوناشين: كبلجية '+(x.crew&&x.crew.cablemen||0)+'، هكاكين '+(x.crew&&x.crew.hookmen||0)+'، وناشين '+(x.crew&&x.crew.operators||0)+'، عصفورة '+(x.crew&&x.crew.signal||0));}}});
+    lines.push('','المقاولون:');(u.contractors||[]).forEach(function(c,i){lines.push((i+1)+') '+(c.type||'')+' — '+(c.name||'')+' — '+(c.type==='عمالة'?'عدد العمال: ':'العدد: ')+(c.count||'0'));if(c.plates)lines.push('أرقام القلابات:\n'+c.plates);});if(u.note)lines.push('','ملاحظات: '+u.note);return lines.join('\n');
+  }
+  function nextPeriodicNumber(arr){return (arr||[]).reduce(function(m,u){return Math.max(m,Number(u.number)||0);},0)+1;}
+  function renderPeriodicUpdates(){var box=$('periodicUpdates');box.textContent='';var arr=pData().updates||[];$('periodicCount').textContent=arr.length+' تحديث';$('pNext').value=String(nextPeriodicNumber(arr));if(!arr.length){var p=document.createElement('p');p.className='hint';p.textContent='لم يتم حفظ أي تحديث لهذه المركب بعد.';box.appendChild(p);return;}
+    arr.slice().reverse().forEach(function(u,ri){var idx=arr.length-1-ri,row=document.createElement('div');row.className='update-item';var title=document.createElement('strong');title.textContent='التحديث رقم '+u.number+' — '+(u.shift||'');var meta=document.createElement('small');meta.textContent=u.savedAt||'';var actions=document.createElement('div');actions.className='actions';var view=document.createElement('button');view.type='button';view.textContent='عرض التحديث';view.addEventListener('click',function(){$('periodicPreview').textContent=periodicText(arr[idx]);$('periodicPreview').hidden=false;});var send=document.createElement('button');send.type='button';send.className='primary';send.textContent='إنشاء صورة وإرسال واتساب';send.addEventListener('click',function(){makePeriodicShare(arr[idx]);});var copy=document.createElement('button');copy.type='button';copy.textContent='نسخ النص';copy.addEventListener('click',function(){var txt=periodicText(arr[idx]);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast('تم نسخ التحديث للإرسال.');}).catch(function(){toast('تعذر النسخ؛ افتح التحديث وانسخ النص يدويًا.');});}else{ $('periodicPreview').textContent=txt;$('periodicPreview').hidden=false;toast('افتح التحديث وانسخ النص يدويًا.');}});var del=document.createElement('button');del.type='button';del.className='danger';del.textContent='حذف البيان';del.addEventListener('click',function(){askConfirm('هل أنت متأكد من حذف التحديث رقم '+u.number+'؟ لا يمكن التراجع عن الحذف.',function(){pData().updates.splice(idx,1);pSave();$('periodicPreview').hidden=true;$('periodicPreview').textContent='';renderPeriodicUpdates();toast('تم حذف البيان الدوري.');});});actions.appendChild(view);actions.appendChild(send);actions.appendChild(copy);actions.appendChild(del);row.appendChild(title);row.appendChild(meta);row.appendChild(actions);box.appendChild(row);});
+  }
+  $('addContractor').addEventListener('click',function(){var d=pData();d.contractors.push({type:'قلابات',name:'',count:'',plates:''});renderContractors();pSave();});
+  $('addLaborContractor').addEventListener('click',function(){var d=pData();d.contractors.push({type:'عمالة',name:'',count:'',plates:''});renderContractors();pSave();});
+  $('pNote').addEventListener('input',function(){pData().note=this.value;pSave();});
+  $('pShift').addEventListener('change',function(){pData().shift=this.value;pSave();});
+  $('pHolds').addEventListener('input',function(){st.holds=this.value;$('holds').value=this.value;save();});
+  $('whAdd').addEventListener('click',function(){var w=ensureWork(pData());if(w.type==='shift')w.shift.push({from:'',to:'',trips:'',qty:''});else if(w.type==='load'||w.type==='unload')w[w.type].push({vessel:'',trips:'',qty:''});else return;renderWork();pSave();var ins=$('whWorkBody').querySelectorAll('.contractor-card input');if(ins.length){var k=w.type==='shift'?4:3;ins[ins.length-k].focus();}});
+  Array.prototype.forEach.call(document.querySelectorAll('.addFactory'),function(b){b.addEventListener('click',function(){st.factories.push({name:'',hold:''});renderFactories();save();var ins=b.parentElement.querySelectorAll('.fac-list input');if(ins.length)ins[ins.length-2].focus();});});
+  $('pTransferCount').addEventListener('input',function(){pData().transferCount=this.value;pSave();});
+  $('pVessel').addEventListener('input',function(){if(periodicTarget()==='warehouse'){pData().entityName=this.value;pSave();}});$('pClient').addEventListener('input',function(){if(periodicTarget()==='warehouse'){pData().client=this.value;pSave();}});$('pCargo').addEventListener('input',function(){if(periodicTarget()==='warehouse'){pData().cargo=this.value;pSave();}});$('pTargetType').addEventListener('change',function(){renderPeriodic();});
+  $('savePeriodic').addEventListener('click',function(){var d=pData(),wh=periodicTarget()==='warehouse',nm=wh?($('pVessel').value||'').trim():(st.name||'').trim();if(!nm){toast(wh?'اكتب اسم المخزن أو الساحة أولاً.':'اكتب اسم المركب أولاً من تاب بيان نهاية الوردية.');return;}if(wh){d.entityName=nm;d.client=$('pClient').value;d.cargo=$('pCargo').value;}var u={number:nextPeriodicNumber(d.updates),targetType:wh?'warehouse':'vessel',targetLabel:wh?'المخزن / الساحة':'المركب',name:nm,client:wh?($('pClient').value||''):(st.client||''),cargo:wh?($('pCargo').value||''):(st.cargo||''),date:st.date||today(),shift:$('pShift').value||st.shift||'نهاري',holds:wh?'':(st.holds||''),factories:(!wh&&isFeed())?JSON.parse(JSON.stringify((st.factories||[]).filter(function(f){return String(f.name||'').trim()||String(f.hold||'').trim();}))):[],preparer:(store.user||'').trim(),savedAt:new Date().toLocaleString('ar-EG'),equipment:JSON.parse(JSON.stringify(d.equipment)),contractors:JSON.parse(JSON.stringify(d.contractors)),work:wh?workSnapshot(d):undefined,transferCount:wh?String(whSummary(ensureWork(d)).t||''):(d.transferCount||''),note:d.note||''};d.updates.push(u);d.note='';d.transferCount='';if(wh){var keepT=ensureWork(d).type;d.work=workDefault();d.work.type=keepT;renderWork();}$('pNote').value='';$('pTransferCount').value='';pSave();renderPeriodicUpdates();$('pNext').value=String(nextPeriodicNumber(d.updates));toast('تم حفظ التحديث رقم '+u.number+' بنجاح.');});
+  function setTab(which){var end=which==='end';$('endPanel').hidden=!end;$('periodicPanel').hidden=end;$('make').hidden=!end;$('tabEnd').setAttribute('aria-pressed',end?'true':'false');$('tabPeriodic').setAttribute('aria-pressed',end?'false':'true');if(!end)renderPeriodic();}
+  $('tabEnd').addEventListener('click',function(){setTab('end');});$('tabPeriodic').addEventListener('click',function(){setTab('periodic');});
+
+  function renderAll(){renderChips();renderForm();renderHistory();renderPeriodic();resetDel();}
+
+  document.querySelectorAll('[data-k]').forEach(function(el){
+    el.addEventListener('input',function(){st[el.getAttribute('data-k')]=el.value;refreshCalc();if(el.id==='name')renderChips();if(el.id==='cargo')renderFactories();if(el.id==='holds')$('pHolds').value=el.value;save();});
+  });
+  $('user').addEventListener('input',function(){store.user=$('user').value;try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}});
+  $('openSettings').addEventListener('click',function(){$('settingsUser').value=store.user||'';$('settingsModal').hidden=false;$('settingsUser').focus();});
+  $('closeSettings').addEventListener('click',function(){$('settingsModal').hidden=true;});
+  $('saveSettings').addEventListener('click',function(){store.user=$('settingsUser').value.trim();$('user').value=store.user;try{store.vessels[st.id]=st;localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}$('settingsModal').hidden=true;toast(store.user?'تم حفظ اسم الموظف وسيظهر تلقائيًا في البيان.':'تم مسح اسم الموظف من الإعدادات.');});
+  document.querySelectorAll('[data-op]').forEach(function(b){b.addEventListener('click',function(){st.op=b.getAttribute('data-op');document.querySelectorAll('[data-op]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false');});save();});});
+  $('addStop').addEventListener('click',function(){st.stops.push({shift:st.shift,equip:'',no:'',reason:'',from:'',to:'',hrs:0});renderStops();save();var rows=$('stops').querySelectorAll('.stop select');if(rows.length){rows[rows.length-1].focus();}});
+
+  $('newVessel').addEventListener('click',function(){
+    askConfirm('سيتم الاحتفاظ بالبيان الحالي كما هو، وفتح بيان جديد فارغ تمامًا. هل تريد المتابعة؟',function(){
+    clearTimeout(saveT);
+    store.vessels[st.id]=st;
+    try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}
+    var s=blank();
+    store.vessels[s.id]=s;store.cur=s.id;st=s;store.example=false;
+    renderAll();
+    try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}
+    $('name').focus();toast('تم فتح بيان جديد فارغ، والبيان السابق محفوظ.');
+    });
+  });
+  $('newDay').addEventListener('click',function(){
+    askConfirm('سيتم حفظ ملخص اليوم الحالي في السجل قبل بدء يوم جديد. هل تريد المتابعة؟',function(){
+    var snap={laborContractor:st.laborContractor||'',laborCount:st.laborCount||'',date:st.date||today(),shift:st.shift,op:st.op,total:st.total||'',cur:st.cur||'',qty:st.qty||'',name:st.name||'',client:st.client||'',cargo:st.cargo||'',berth:st.berth||'',holds:st.holds||'',factories:JSON.parse(JSON.stringify(st.factories||[])),stores:JSON.parse(JSON.stringify(st.stores||[])),eq:JSON.parse(JSON.stringify(st.eq||{})),eqContractors:JSON.parse(JSON.stringify(st.eqContractors||{})),stops:JSON.parse(JSON.stringify((st.stops||[]).filter(function(x){return x.shift===st.shift&&String(x.equip||'').trim();}))),note:(st.shift==='ليلي'?st.noteN:st.noteD)||'',savedAt:new Date().toISOString()};
+    if(!Array.isArray(st.history))st.history=[];if(!st.eqContractors)st.eqContractors={};
+    st.history.push(snap);
+    var d=new Date((st.date||today())+'T12:00:00');d.setDate(d.getDate()+1);
+    st.cur='';st.stops=[];st.noteD='';st.noteN='';st.laborContractor='';st.laborCount='';
+    st.date=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    renderForm();renderHistory();save();toast('تم حفظ ملخص اليوم في السجل وبدء يوم جديد. حدّث الإجمالي الحالي.');
+    });
+  });
+  $('clearExample').addEventListener('click',function(){
+    delete store.vessels[st.id];var s=blank();store.vessels[s.id]=s;store.cur=s.id;st=s;renderAll();save();
+  });
+  function resetDel(){var b=$('delBox');b.textContent='';var x=document.createElement('button');x.className='danger ghost';x.textContent='حذف هذا المركب';x.addEventListener('click',askDel);b.appendChild(x);}
+  function askDel(){
+    var b=$('delBox');b.textContent='';var w=document.createElement('div');w.className='confirm';
+    var t=document.createElement('span');t.textContent='تأكيد حذف «'+(st.name||'بدون اسم')+'»؟';
+    var y=document.createElement('button');y.className='danger';y.textContent='نعم، احذف';
+    var n=document.createElement('button');n.textContent='إلغاء';
+    y.addEventListener('click',function(){
+      delete store.vessels[st.id];var ids=Object.keys(store.vessels);
+      if(ids.length){store.cur=ids[0];st=store.vessels[ids[0]];}else{var s=blank();store.vessels[s.id]=s;store.cur=s.id;st=s;}
+      renderAll();try{localStorage.setItem(KEY,JSON.stringify(store));}catch(e){}
+    });
+    n.addEventListener('click',resetDel);
+    w.appendChild(t);w.appendChild(y);w.appendChild(n);b.appendChild(w);
+  }
+
+  /* ---------- image ---------- */
+  var FONT="Tahoma, Noto Naskh Arabic, Arial, sans-serif";
+  var C={bg:'#ffffff',ink:'#0f2d44',mute:'#5b6b78',line:'#d6dde3',soft:'#f3f6f8',acc:'#c8541a',good:'#1b7f79',warn:'#b3261e'};
+  var W=1080,M=48;
+  function arDate(s){var p=(s||'').split('-');return p.length===3?(p[2]+'/'+p[1]+'/'+p[0]):'';}
+
+  async function drawImage(){
+    try{await Promise.all([document.fonts.load('400 24px Cairo'),document.fonts.load('700 24px Cairo'),document.fonts.load('800 24px Cairo')]);}catch(e){}
+    var cv=document.createElement('canvas');cv.width=W;cv.height=4200;
+    var x=cv.getContext('2d');x.direction='rtl';x.textBaseline='alphabetic';
+    var R=W-M,L=M,CW=W-2*M,y=0;
+    x.fillStyle=C.bg;x.fillRect(0,0,W,4200);
+    function font(w,s){x.font=w+' '+s+'px '+FONT;}
+    function T(t,px,py,w,s,col,al){font(w,s);x.fillStyle=col;x.textAlign=al||'right';x.fillText(t,px,py);}
+    function fit(t,maxW,w,s,minS){var z=s;font(w,z);while(x.measureText(t).width>maxW&&z>minS){z-=2;font(w,z);}return z;}
+    function wrap(t,maxW,w,s){
+      font(w,s);var out=[];
+      String(t).split('\n').forEach(function(par){
+        var words=par.split(/\s+/).filter(Boolean),line='';
+        if(!words.length){out.push('');return;}
+        words.forEach(function(wd){
+          var tr=line?line+' '+wd:wd;
+          if(x.measureText(tr).width>maxW&&line){out.push(line);line=wd;}else line=tr;
+        });
+        out.push(line);
+      });return out;
+    }
+    function rect(a,b,w,h,col){x.fillStyle=col;x.fillRect(a,b,w,h);}
+    function hr(){rect(M,y,CW,2,C.line);}
+    var c=calc();
+
+    /* header */
+    rect(0,0,W,170,C.ink);
+    T('سيسكو ترانس للوجستيات المتطورة — فرع دمياط',R,62,'600',28,'#c9d7e2');
+    T('بيان مركب — الوردية '+(st.shift==='ليلي'?'الليلية':'النهارية'),R,128,'800',50,'#ffffff');
+    T(arDate(st.date),L,62,'700',28,'#ffffff','left');
+    var opw=st.op==='شحن'?'شحن':'تفريغ';
+    font('700',28);var ow=x.measureText(opw).width+44;
+    x.fillStyle=C.acc;x.beginPath();x.roundRect?x.roundRect(L,86,ow,56,10):x.rect(L,86,ow,56);x.fill();
+    T(opw,L+ow/2,126,'700',28,'#ffffff','center');
+    y=170;
+
+    /* vessel */
+    y+=54;
+    var nm=st.name.trim()||'—';var z=fit(nm,CW-36,'800',78,38);
+    rect(M,y-58,CW,112,'#fff4ec');
+    T(nm,R-18,y+18,'800',z,C.ink);
+    y+=76;hr();y+=14;
+
+    /* info grid */
+    var info=[['العميل / الشركة',st.client],['البضاعة',st.cargo],['الكمية الكلية',st.qty?fmt(c.q)+' طن':''],['الرصيف',st.berth],['عدد العنابر',st.holds]];
+    var cw=(CW-24)/2;
+    for(var i=0;i<info.length;i+=2){
+      for(var j=0;j<2;j++){
+        var it=info[i+j];if(!it)continue;
+        var cx=R-j*(cw+24);
+        T(it[0],cx,y+30,'400',22,C.mute);
+        var v=it[1]&&String(it[1]).trim()?String(it[1]).trim():'—';
+        var zz=fit(v,cw,'700',32,20);T(v,cx,y+72,'700',zz,C.ink);
+      }
+      y+=94;
+    }
+    var stx=storeText();
+    T('المخزن / الساحة',R,y+30,'400',22,C.mute);y+=34;
+    wrap(stx||'—',CW,'700',32).forEach(function(l){T(l,R,y+34,'700',32,C.ink);y+=46;});
+    y+=8;
+    /* equipment */
+    var eqs=EQ.filter(function(e){return (st.eq[e[0]]||0)>0||String((st.eqContractors||{})[e[0]]||'').trim();});
+    if(eqs.length){
+      y+=4;T('المعدات العاملة',R,y+32,'800',30,C.acc);y+=54;
+      var bx=R;
+      eqs.forEach(function(e){
+        var lab=e[1]+'  '+st.eq[e[0]];font('800',34);var bw=x.measureText(lab).width+44;
+        if(bx-bw<L){bx=R;y+=76;}
+        x.fillStyle='#eaf0f4';x.fillRect(bx-bw,y,bw,62);x.strokeStyle=C.line;x.lineWidth=2;x.strokeRect(bx-bw,y,bw,62);
+        T(lab,bx-bw/2,y+43,'800',34,C.ink,'center');bx-=bw+14;
+      });
+      y+=82;
+      eqs.forEach(function(e){var cn=(st.eqContractors||{})[e[0]];if(cn&&String(cn).trim()){T(e[1]+' — الشركة / المقاول: '+cn,R,y+26,'500',24,C.mute);y+=38;}});
+    }
+    y+=6;hr();y+=20;
+
+    /* feed factories */
+    var facs=(st.factories||[]).filter(function(f){return String(f.name||'').trim()||String(f.hold||'').trim();});
+    if(isFeed()&&facs.length){
+      T('مصانع العلف (كل مصنع في عنبر)',R,y+30,'800',30,C.acc);y+=54;
+      facs.forEach(function(f){var t2='مصنع '+(f.name||'—')+(f.hold?' — عنبر '+f.hold:'');wrap(t2,CW-40,'600',28).forEach(function(l){T(l,R-12,y+30,'600',28,C.ink);y+=42;});});
+      y+=8;hr();y+=20;
+    }
+    /* quantities table */
+    T('الكميات بالطن',R,y+30,'700',30,C.ink);y+=52;
+    var c0=200,cwid=(CW-c0)/3;
+    var rows=[['',['الوردية','الإجمالي','المتبقي']],[st.shift==='ليلي'?'ليلي':'نهاري',[fmt(c.cur),fmt(c.tot),fmt(c.rem)],c.rem<0]];
+    rows.forEach(function(r,ri){
+      var rh=ri===0?48:62;
+      if(ri===0)rect(M,y,CW,rh,C.ink);else if(ri%2===0)rect(M,y,CW,rh,C.soft);
+      var colH=ri===0?'#ffffff':C.ink;
+      if(r[0])T(r[0],R-18,y+42,'700',30,C.ink);
+      r[1].forEach(function(cell,k){
+        var cxx=R-c0-k*cwid-cwid/2;
+        var colr=ri===0?'#ffffff':(k===2&&r[2]?C.warn:(k===2?C.acc:C.ink));
+        T(cell,cxx,y+(ri===0?33:44),ri===0?'600':'800',ri===0?24:32,colr,'center');
+      });
+      y+=rh;
+    });
+    rect(M,y,CW,2,C.line);y+=8;
+    y+=14;
+    /* progress */
+    var pct=c.q>0?Math.max(0,Math.min(100,(c.tot)/c.q*100)):0;
+    rect(M,y,CW,22,C.soft);rect(M,y,CW*pct/100,22,C.good);
+    y+=52;T('نسبة الإنجاز '+(Math.round(pct*10)/10)+'%',R,y,'700',26,C.good);
+    T(fmt(c.tot)+' من '+fmt(c.q)+' طن',L,y,'400',24,C.mute,'left');
+    y+=26;hr();y+=22;
+
+    /* stoppages */
+    var sst=[],seenStops={};st.stops.forEach(function(s){if(s.shift!==st.shift||!String(s.equip||'').trim())return;var meaningful=String(s.no||'').trim()||String(s.reason||'').trim()||String(s.from||'').trim()||String(s.to||'').trim()||s.equip==='توقف طوال الوردية';if(!meaningful)return;var key=[s.equip,s.no,s.reason,s.from,s.to].join('|');if(seenStops[key])return;seenStops[key]=1;sst.push(s);});
+    var th=sst.reduce(function(a,s){return a+dur(s);},0);
+    T('التوقفات',R,y+30,'700',30,C.ink);
+    if(sst.length)T('الإجمالي '+hm(th),L,y+30,'700',26,C.warn,'left');
+    y+=48;
+    if(!sst.length){T('لا توجد توقفات',R,y+26,'400',26,C.mute);y+=46;}
+    else sst.forEach(function(s){
+      var tm=s.from&&s.to?' (من '+s.from+' إلى '+s.to+' — '+hm(dur(s))+')':(s.from?' (من '+s.from+' — مستمر)':(num(s.hrs)?' ('+hm(num(s.hrs))+')':''));
+      var t=s.equip+(s.no?' '+s.no:'')+(s.reason?' — '+s.reason:'')+tm;
+      var ls=wrap(t,CW-40,'400',26);
+      rect(R-6,y+4,6,ls.length*40-8,C.acc);
+      ls.forEach(function(l){T(l,R-24,y+30,'400',26,C.ink);y+=40;});y+=8;
+    });
+    y+=4;
+
+    /* labor */
+    if(String(st.laborContractor||'').trim()||String(st.laborCount||'').trim()){
+      y+=10;hr();y+=22;T('العمالة',R,y+30,'800',32,C.acc);y+=58;
+      T('اسم المقاول: '+(st.laborContractor||'—'),R,y+28,'600',28,C.ink);
+      T('عدد العمال: '+(st.laborCount||'—'),L,y+28,'700',28,C.ink,'left');y+=58;
+    }
+
+    /* notes */
+    (st.shift==='ليلي'?[['بيان الوردية الليلية',st.noteN]]:[['بيان الوردية النهارية',st.noteD]]).forEach(function(n){
+      if(!n[1].trim())return;
+      hr();y+=22;T(n[0],R,y+30,'700',30,C.ink);y+=52;
+      wrap(n[1].trim(),CW,'400',27).forEach(function(l){T(l,R,y+28,'400',27,C.ink);y+=42;});
+      y+=10;
+    });
+
+    /* footer */
+    y+=6;hr();y+=40;
+    var who=(store.user||'').trim();
+    T('المُعِد: '+(who||'—'),R,y,'800',28,C.ink);
+    T('بيان مركب — '+arDate(st.date),L,y,'400',22,C.mute,'left');
+    y+=36;
+
+    var out=document.createElement('canvas');out.width=W;out.height=Math.ceil(y);
+    out.getContext('2d').drawImage(cv,0,0,W,out.height,0,0,W,out.height);
+    return out;
+  }
+
+  // Export current vessel data and archived day/shift snapshots in an Excel-compatible UTF-8 CSV.
+  function csvCell(v){var z=(v==null?'':String(v));return '"'+z.replace(/"/g,'""')+'"';}
+  function periodicCsvRow(u,v){return [(u.targetType==='warehouse'?'بيان دوري مخزن - تحديث ':'بيان دوري - تحديث ')+u.number,u.name||v.name||'',u.date||'', '',(u.shift==='ليلي'?'ليلية':'نهارية'),u.client||v.client||'',u.cargo||v.cargo||'','','','','','',P_EQ.filter(function(e){var z=u.equipment&&u.equipment[e[0]];return z&&(z.count||z.codes||z.contractor||(z.contractors||[]).length||(e[0]==='cranes'&&(String(z.craneCount||'').trim()||Object.values(z.crew||{}).some(function(v){return Number(v)>0;}))));}).map(function(e){var z=u.equipment[e[0]];return e[1]+(e[0]==='cranes'?' ('+(u.targetType==='warehouse'?'أوناش المخزن':(z.craneType==='land'?'أوناش بري':'أوناش مركب'))+') — عدد الأوناش: '+(z.craneCount||0):'')+': '+(z.contractors||[]).map(function(c){return (c.kind==='company'?'شركة ':'مقاول ')+(c.name||'')+': '+(c.count||0)+(c.codes?' ['+c.codes.replace(/\n/g,'، ')+']':'');}).join('؛ ');}).join(' | '),(u.contractors||[]).map(function(c){return [c.type,c.name,'عدد '+c.count,'الأرقام '+c.plates].join(' ');}).join(' | '),'','',extraText(u)+(u.note||'')];}
+  function exportRows(){
+    var rows=[['نوع السجل','اسم المركب','التاريخ','العملية','الوردية','العميل','البضاعة','الكمية الكلية','الإجمالي التراكمي','كمية الوردية','الرصيف','المخزن/الساحة','المعدات','التوقفات','اسم مقاول العمالة','عدد العمال','البيان']];
+    Object.keys(store.vessels||{}).forEach(function(id){
+      var v=store.vessels[id];
+      function pack(kind,d){
+        var stores=(d.stores||v.stores||[]).filter(function(a){return a.name;}).map(function(a){return a.type+' '+a.name;}).join(' | ');
+        var eq=d.eq||v.eq||{};var eqText=EQ.filter(function(e){return Number(eq[e[0]]||0)>0;}).map(function(e){return e[1]+': '+eq[e[0]];}).join(' | ');
+        var stops=(d.stops||[]).map(function(x){return [x.equip,x.no,x.reason,x.from,x.to].filter(Boolean).join(' - ');}).join(' | ');
+        rows.push([kind,d.name||v.name||'',d.date||v.date||'',d.op||v.op||'',d.shift||'',d.client||v.client||'',d.cargo||v.cargo||'',d.qty||v.qty||'',d.total||'',d.cur||'',d.berth||v.berth||'',stores,eqText,stops,d.laborContractor||'',d.laborCount||'',endExtra(d,v)+(d.note||'')]);
+      }
+      (v.history||[]).forEach(function(h){pack('سجل محفوظ',h);});
+      (v.periodic&&v.periodic.updates||[]).forEach(function(u){rows.push(periodicCsvRow(u,v));});
+      pack('البيانات الحالية',{name:v.name,date:v.date,op:v.op,shift:v.shift,client:v.client,cargo:v.cargo,qty:v.qty,total:v.total,cur:v.cur,berth:v.berth,laborContractor:v.laborContractor,laborCount:v.laborCount,holds:v.holds,factories:v.factories,cargo2:v.cargo,stores:v.stores,eq:v.eq,stops:(v.stops||[]).filter(function(x){return x.shift===v.shift&&String(x.equip||'').trim();}),note:v.shift==='ليلي'?v.noteN:v.noteD});
+    });
+    ((store.periodicStandalone&&store.periodicStandalone.updates)||[]).forEach(function(u){rows.push(periodicCsvRow(u,{}));});
+    return rows;
+  }
+  $('exportExcel').addEventListener('click',async function(){
+    try{
+      var csv='﻿'+exportRows().map(function(r){return r.map(csvCell).join(',');}).join('\r\n');
+      var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+      var r=await saveBlob(blob,'بيانات_المراكب_'+today()+'.csv','text/csv');
+      if(r==='cancelled')return;
+      toast(r==='opened'?'اضغط مشاركة ثم «حفظ في الملفات».':'تم تجهيز ملف Excel المتوافق.');
+    }catch(e){toast('تعذر تصدير البيانات.');}
+  });
+  function validateBeforeOutput(){
+    var q=num(st.qty),t=num(st.total),c=num(st.cur);
+    if(!st.name||!st.name.trim()){toast('اكتب اسم المركب أولاً.');$('name').focus();return false;}
+    if(!(store.user||'').trim()){toast('اكتب اسم المُعِد أولاً؛ لأنه يظهر في التقرير.');$('user').focus();return false;}
+    if(q<=0){toast('أدخل كمية كلية صحيحة أكبر من صفر.');$('qty').focus();return false;}
+    if(t<0||c<0){toast('الكميات لا يمكن أن تكون سالبة.');return false;}
+    if(t>q){toast('الإجمالي التراكمي أكبر من الكمية الكلية؛ راجع الأرقام.');$('total').focus();return false;}
+    if(c>t){toast('كمية الوردية الحالية أكبر من الإجمالي التراكمي؛ راجع الأرقام.');$('cur').focus();return false;}
+    return true;
+  }
+  var lastBlob=null,lastName='',lastFile=null;
+  function toBlob(cv){return new Promise(function(resolve,reject){
+    try{
+      if(cv.toBlob){cv.toBlob(function(blob){if(blob)resolve(blob);else reject(new Error('تعذر تحويل الصورة'));},'image/png');return;}
+      var data=cv.toDataURL('image/png'),raw=atob(data.split(',')[1]),arr=new Uint8Array(raw.length);
+      for(var i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);
+      resolve(new Blob([arr],{type:'image/png'}));
+    }catch(e){reject(e);}
+  });}
+  function downloadLastImage(){$('share').click();}
+  $('make').addEventListener('click',async function(){
+    if(!validateBeforeOutput())return;
+    var b=$('make');b.disabled=true;b.textContent='جاري الإنشاء...';
+    try{
+      var cv=await drawImage();lastBlob=await toBlob(cv);
+      lastName='بيان مركب '+(st.shift==='ليلي'?'ليلي':'نهاري')+' - '+((st.name||'مركب').replace(/[\\/:*?"<>|]/g,'').trim())+' - '+(st.date||today())+'.png';
+      try{lastFile=new File([lastBlob],'bayan-markeb.png',{type:'image/png'});}catch(e){lastFile=null;}
+      $('preview').src=cv.toDataURL('image/png');
+      $('modal').hidden=false;$('modal').scrollTop=0;
+    }catch(e){toast('تعذر إنشاء الصورة، حاول مرة أخرى.');}
+    b.disabled=false;b.textContent='إنشاء الصورة';
+  });
+  $('closeModal').addEventListener('click',function(){$('modal').hidden=true;});
+  $('share').addEventListener('click',async function(){
+    if(!lastBlob){toast('أنشئ الصورة أولاً.');return;}
+    try{
+      var r=await saveBlob(lastBlob,lastName||'bayan.png','image/png');
+      if(r==='cancelled'||r==='shared')return;
+      if(r==='opened'){$('hint').textContent='اضغط مطولاً على الصورة المفتوحة واختر «مشاركة» ثم واتساب، أو «حفظ في الصور».';return;}
+      $('hint').textContent='تم تنزيل الصورة. افتحها من التنزيلات/الصور ثم اختر مشاركة > واتساب. لو لم تظهر، اضغط مطولاً على المعاينة واحفظ الصورة.';
+      toast('تم تنزيل الصورة. أرسلها عبر واتساب.');
+    }catch(e){toast('تعذر الإرسال؛ اضغط مطولاً على معاينة الصورة واختر حفظ/مشاركة.');}
+  });
+  // Download a portable copy of this tool (pristine source captured at startup).
+  $('downloadApp').addEventListener('click',async function(){
+    try{
+      var blob=new Blob(['﻿'+PRISTINE],{type:'text/html;charset=utf-8'});
+      var r=await saveBlob(blob,'Bayan_Markeb_Offline.html','text/html');
+      if(r==='cancelled')return;
+      toast(r==='shared'?'اختر «حفظ في الملفات» من قائمة المشاركة.':r==='saved'?'تم تجهيز الملف.':r==='opened'?'التنزيل المباشر غير متاح هنا ('+window.__dlErr+'). افتح الأداة من تطبيق Claude.':'تم تنزيل نسخة الأداة.');
+    }catch(e){toast('تعذر تنزيل النسخة. افتح الأداة في Safari/Chrome ثم استخدم قائمة المشاركة.');}
+  });
+
+  $('copyImg').addEventListener('click',async function(){
+    if(!lastBlob)return;
+    try{
+      await navigator.clipboard.write([new ClipboardItem({'image/png':lastBlob})]);
+      toast('تم نسخ الصورة. افتح واتساب والصقها في المحادثة.');
+    }catch(e){toast('النسخ غير مدعوم في هذا المتصفح؛ استخدم زر إرسال الصورة لتنزيلها ثم أرفقها في واتساب.');}
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){$('confirmModal').hidden=true;$('modal').hidden=true;$('historyModal').hidden=true;$('settingsModal').hidden=true;}});
+
+  try{
+    var standalone=window.navigator.standalone===true||(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches);
+    if(isIOS()&&!standalone&&!localStorage.getItem('bm-tip-done')){$('installTip').hidden=false;}
+    $('installTipClose').addEventListener('click',function(){$('installTip').hidden=true;try{localStorage.setItem('bm-tip-done','1');}catch(e){}});
+  }catch(e){}
+  if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+  load();
+  if(st.id&&store.vessels[st.id]&&store.example!==false&&st.name==='MV EXAMPLE')st.isExample=true;
+  renderAll();
+})();
+</script></body></html>
