@@ -1,0 +1,23 @@
+<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>فحص الإرسال</title>
+<style>body{font:16px/1.7 system-ui,Tahoma;margin:16px;max-width:760px}pre{background:#eee;padding:10px;border-radius:8px;white-space:pre-wrap;word-break:break-all;direction:ltr;text-align:left}button{font:inherit;padding:10px 18px}</style>
+<script src="config.js"></script></head><body>
+<h2>فحص الإرسال للشيت</h2>
+<pre id="o">جاري الفحص...</pre>
+<button id="b">أرسل بيان تجريبي الآن</button>
+<script>
+var o=document.getElementById('o'),L=[];function log(t){L.push(t);o.textContent=L.join('\n');}
+var S=window.BM_SYNC;
+log('1) config.js: '+(S?'تم تحميله':'لم يتم تحميله !!'));
+if(S){log('2) url: '+String(S.url).slice(0,60)+'...'+String(S.url).slice(-12));log('3) key: '+(S.key?String(S.key).slice(0,3)+'... طوله '+S.key.length:'فاضي !!'));}
+try{var d=localStorage.getItem('bm-outbox');log('4) طابور الإرسال (outbox): '+(d?JSON.parse(d).length+' بيان معلّق':'فاضي'));}catch(e){log('4) تعذّر قراءة الطابور');}
+try{var st=JSON.parse(localStorage.getItem('bayan-markeb-test')||'null');if(st){var v=st.vessels&&st.vessels[st.cur];log('5) المركب الحالي: '+(v&&v.name)+' | isExample='+(v&&v.isExample));}else log('5) لا توجد بيانات محفوظة للأداة');}catch(e){}
+document.getElementById('b').onclick=async function(){
+  log('--- إرسال تجريبي ---');
+  var rec={id:'E|DIAG TEST|2026-01-01|نهاري',type:'E',vessel:'DIAG TEST',date:'2026-01-01',shift:'نهاري',preparer:'فحص',device:'diag',updatedAt:new Date().toISOString(),data:{name:'DIAG TEST',qty:'1',total:'1',cur:'1',eq:{},stops:[]}};
+  try{
+    var r=await fetch(S.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:S.key,rec:rec}),redirect:'follow'});
+    log('الاستجابة: HTTP '+r.status);
+    var t=await r.text();log('النص: '+t.slice(0,300));
+  }catch(e){log('فشل الإرسال: '+e.name+' - '+e.message);}
+};
+</script></body></html>
