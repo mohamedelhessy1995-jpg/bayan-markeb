@@ -1206,7 +1206,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
   }
   function syncEnd(){
     try{
-      if(!syncOn()||st.isExample)return;
+      if(!syncOn()||normName(st.name)==='MV EXAMPLE'||!normName(st.name))return;
       var d=JSON.parse(JSON.stringify(st));delete d.history;delete d.periodic;delete d.isExample;delete d.id;
       var who=(store.user||'').trim();
       queueSync({id:'E|'+normName(st.name)+'|'+(st.date||today())+'|'+(st.shift||''),type:'E',vessel:(st.name||'').trim(),date:st.date||today(),shift:st.shift||'',preparer:who,device:deviceId(),updatedAt:new Date().toISOString(),data:d});
