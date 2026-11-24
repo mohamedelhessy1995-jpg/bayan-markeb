@@ -599,6 +599,7 @@ function render(){
       c.appendChild(h('div',{text:'تم '+fmt(x.total)+' من '+fmt(x.qty)+' طن ('+pc+'%) — المتبقي '+fmt(x.rem)}));
       c.appendChild(h('div',{cls:'mut',text:x.E.length+' بيان وردية • '+x.P.length+' بيان دوري'+(x.MV.length?' • '+x.MV.length+' حركة مخزن':'')+(x.F?' • بيان نهائي ✓':'')+' • آخر وصول '+stamp(x.lastAt)}));
     }else c.appendChild(h('div',{cls:'mut',text:x.P.length+' بيان دوري • آخر وصول '+stamp(x.lastAt)}));
+    if(isSuper()&&window.delEntityBtn){var db=window.delEntityBtn(x,mode);if(db)c.appendChild(db);}
     box.appendChild(c);
   });
   if(!n)box.appendChild(h('div',{cls:'mut',text:records.length?'لا نتائج.':'لم تصل أي بيانات بعد.'}));
@@ -612,6 +613,7 @@ function showDetail(key,g){
   var x=mode==='ves'?g.V[key]:g.W[key];
   if(!x){openKey=null;render();return;}
   box.appendChild(h('div',{cls:'row back'},[h('button',{cls:'ghost',text:'← رجوع',on:function(){openKey=null;render();}}),h('button',{text:'تصدير Excel لهذا '+(mode==='ves'?'المركب':'المخزن'),on:function(){exportXlsx([x],mode);}})]));
+  if(isSuper()&&window.entityTools){var et=window.entityTools(x,mode);if(et)box.appendChild(et);}
   if(mode==='wh'){
     box.appendChild(h('div',{cls:'card'},[h('h2',{text:x.name,style:'margin:0'})]));
     var rw=viewRows(x.P,key);VIEW_ORDER.forEach(function(k){viewSection(box,k,rw[k]);});
@@ -798,6 +800,27 @@ function delBtn(r){
     b.disabled=true;api({action:'deleteRecord',id:r.id}).then(function(j){if(j.ok){records=records.filter(function(z){return z.id!==r.id;});flatCache={};msg('تم حذف البيان.');render();}else msg('تعذر الحذف: '+j.error,true);});});
   return b;
 }
+/* ---- حذف مركب/مخزن بالكامل + تعديل بيانات اللجنة (للسوبر) ---- */
+function entityIds(x,kind){var a=[];(x.E||[]).concat(x.P||[]).forEach(function(r){a.push(r.id);});if(kind==='ves'&&x.F&&x.F.id)a.push(x.F.id);return a.filter(function(v,i,s){return v&&s.indexOf(v)===i;});}
+function entityCounts(x,kind){var t=[];if(kind==='ves'){if((x.E||[]).length)t.push(x.E.length+' بيان وردية');if((x.P||[]).length)t.push(x.P.length+' بيان دوري');if(x.F)t.push('البيان النهائي');}else t.push((x.P||[]).length+' بيان');return t.join(' + ');}
+window.delEntityBtn=function(x,kind){
+  var wrap=h('div',{style:'margin-top:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap'});
+  function idle(){wrap.textContent='';var b=h('button',{cls:'ghost mini',text:'🗑 حذف'});b.addEventListener('click',function(ev){ev.stopPropagation();ask();});wrap.appendChild(b);}
+  function ask(){wrap.textContent='';wrap.appendChild(h('span',{cls:'mut',text:'حذف «'+x.name+'» نهائيًا ('+entityCounts(x,kind)+')؟'}));
+    var y=h('button',{cls:'mini',text:'نعم، احذف'});y.addEventListener('click',function(ev){ev.stopPropagation();go(y);});
+    var n=h('button',{cls:'ghost mini',text:'إلغاء'});n.addEventListener('click',function(ev){ev.stopPropagation();idle();});wrap.appendChild(y);wrap.appendChild(n);}
+  async function go(y){y.disabled=true;var ids=entityIds(x,kind);var j=await api({action:'deleteRecords',ids:ids});
+    if(j&&j.ok){var set={};ids.forEach(function(i){set[i]=1;});records=records.filter(function(z){return !set[z.id];});flatCache={};openKey=null;msg('تم حذف «'+x.name+'» ('+(j.removed||0)+' سجل).');render();}
+    else{y.disabled=false;msg('تعذر الحذف: '+((j&&j.error)||''),true);}}
+  idle();wrap.addEventListener('click',function(ev){ev.stopPropagation();});return wrap;
+};
+window.entityTools=function(x,kind){
+  var c=h('div',{cls:'card'});
+  c.appendChild(h('div',{cls:'mut',text:'أدوات الإدارة لهذا '+(kind==='ves'?'المركب':'المخزن')+' — الحذف يمسح كل بياناته ('+entityCounts(x,kind)+') من النظام والشيت. لحذف بيان واحد استخدم «حذف البيان» داخل كارته أدناه.'}));
+  var row=h('div',{style:'display:flex;gap:8px;flex-wrap:wrap;margin-top:8px'});
+  if(kind==='ves'){var eb=h('button',{cls:'ghost',text:'✎ تعديل بيانات اللجنة'});eb.addEventListener('click',function(){window.__focusVes=vkey(x.name);setMode('adm');});row.appendChild(eb);}
+  var d=window.delEntityBtn(x,kind);d.style.marginTop='0';row.appendChild(d);c.appendChild(row);return c;
+};
 function histBtn(r,holder){
   if(!isSuper())return null;
   var b=h('button',{cls:'ghost mini',text:'النسخ السابقة'});
@@ -1015,8 +1038,11 @@ function adminVessels(box){
         if(j&&j.ok)done('تم حفظ «'+d.vessel+'».');else{sv.disabled=false;msg('تعذر الحفظ: '+((j&&j.error)||''),true);}});
       var cn=h('button',{cls:'ghost',text:'إلغاء'});cn.addEventListener('click',view);bar.appendChild(sv);bar.appendChild(cn);wrap.appendChild(bar);
     }
-    view();return wrap;
+    view();
+    if(window.__focusVes&&vkey(v.vessel)===window.__focusVes){window.__focusVes=null;edit();setTimeout(function(){try{wrap.scrollIntoView({block:'start'});}catch(_){}},60);}
+    return wrap;
   }
+  var __f=window.__focusVes;if(__f&&!vessels.some(function(v){return vkey(v.vessel)===__f;})){window.__focusVes=null;msg('هذا المركب غير موجود في قائمة اللجنة. أضفه يدويًا من «إضافة مركب» أسفل القائمة.',true);}
   sorted.forEach(function(v){list.appendChild(card(v));});
   if(!sorted.length)list.appendChild(h('div',{cls:'mut',text:'لا توجد مراكب في اللجنة. ارفع ملف VCM أو أضف مركبًا يدويًا.'}));
   var f=h('div',{cls:'card',style:'margin-top:10px'});f.appendChild(h('b',{text:'+ إضافة مركب يدويًا'}));
