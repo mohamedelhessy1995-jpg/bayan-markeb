@@ -60,7 +60,7 @@ h2 small{color:var(--mut);font-weight:400}
   <button class="ghost mini" id="bXlsx">تصدير Excel</button>
   <span id="who" class="mut"></span>
   <button class="ghost mini" id="bLogout" hidden>خروج</button>
-  <a class="mut" id="toTool" href="../" style="align-self:center;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px">← الأداة</a>
+  <a class="mut" id="toTool" href="../" style="align-self:center;text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px">أداة الموظفين ↗</a>
 </header>
 <main>
   <div id="msg" class="msg" hidden></div>
@@ -485,7 +485,7 @@ function cmpRec(a,b){return (a.date<b.date?-1:a.date>b.date?1:0)||(sOrd(a.shift)
 function msg(t,err){var m=$('msg');m.hidden=!t;m.textContent=t||'';m.className='msg'+(err?' err':'');}
 function loadCfg(){try{var c=JSON.parse(localStorage.getItem(CFG_KEY)||'{}');cfg.user=c.user||'';cfg.code=c.code||'';}catch(e){}}
 function saveCfg(){try{if($('fRem').checked)localStorage.setItem(CFG_KEY,JSON.stringify(cfg));else localStorage.removeItem(CFG_KEY);}catch(e){}}
-function showLogin(on){$('setup').hidden=!on;$('list').hidden=on;if(on)$('detail').hidden=true;$('bLogout').hidden=on;$('bRefresh').hidden=on;$('bXlsx').hidden=on;$('who').textContent=on?'':who?('مرحباً، '+who+(role?' — '+(role==='سوبر'?'سوبر يوزر':'مستخدم'):'')):'';$('tAdm').hidden=on||role!=='سوبر';}
+function showLogin(on){$('setup').hidden=!on;$('list').hidden=on;if(on)$('detail').hidden=true;$('bLogout').hidden=on;$('bRefresh').hidden=on;$('bXlsx').hidden=on;$('who').textContent=on?'':who?('مرحباً، '+who+(role?' — '+(role==='سوبر'?'سوبر يوزر':'مستخدم'):'')):'';$('tAdm').hidden=on;}
 
 async function fetchAll(){
   if(!cfg.code){showLogin(true);return;}
@@ -923,7 +923,7 @@ function extraSheets(groups,m,sheets){
 function fld(parent,label,val,cb,type){var i=h('input',{type:type||'text'});i.value=val==null?'':val;i.addEventListener('input',function(){cb(i.value);});parent.appendChild(h('label',{cls:'mut'},[label,i]));return i;}
 async function loadPdfLib(){
   if(window.__pdfjs)return window.__pdfjs;
-  var m=await import('./vendor/pdf.min.mjs');m.GlobalWorkerOptions.workerSrc='./vendor/pdf.worker.min.mjs';window.__pdfjs=m;return m;
+  var m=await import('./pdf.min.mjs');m.GlobalWorkerOptions.workerSrc='./pdf.worker.min.mjs';window.__pdfjs=m;return m;
 }
 function vessRowsFromParse(res){
   var all=(res.berthed||[]).concat(res.waiting||[]);
@@ -1055,7 +1055,11 @@ function adminUsers(box){
 }
 function renderAdmin(){
   addCss();var box=$('admin');box.textContent='';
-  if(!isSuper()){box.appendChild(h('div',{cls:'msg err',text:'هذه الصفحة للسوبر يوزر فقط.'}));return;}
+  if(!isSuper()){var nc=h('div',{cls:'card'});
+    nc.appendChild(h('h2',{text:'الإدارة تحتاج حساب «سوبر»',style:'margin:0 0 6px'}));
+    nc.appendChild(h('div',{text:'أنت داخل الآن بحساب «'+(who||'')+'» وصلاحيته «'+(role||'مستخدم')+'». رفع ملف اللجنة وتعديل/حذف المراكب لا تظهر إلا للسوبر.',style:'line-height:1.8'}));
+    nc.appendChild(h('div',{cls:'mut',style:'margin-top:8px;line-height:1.9;white-space:pre-line',text:'لتحويل حسابك:\n١) افتح Google Sheet ← تبويب «المستخدمون».\n٢) في صف حسابك اكتب في عمود «الصلاحية» كلمة: سوبر\n٣) اضغط «خروج» هنا ثم ادخل من جديد.\n\nأو من قائمة الشيت: «بيان مركب» ← «إضافة سوبر يوزر» (يعطيك اسمًا وكودًا جديدين).'}));
+    box.appendChild(nc);return;}
   adminVcm(box);adminVessels(box);adminLists(box);adminUsers(box);
   var c=h('div',{cls:'card'});c.appendChild(h('div',{cls:'mut',text:'البيانات المعروضة: '+(sinceDays?'آخر '+sinceDays+' يوم':'كل السجلات')+' — '+records.length+' سجل.'}));
   var b=h('button',{cls:'ghost',text:sinceDays?'تحميل كل السجلات':'العودة لآخر 45 يوم'});b.addEventListener('click',function(){sinceDays=sinceDays?0:45;fetchAll();});c.appendChild(b);box.appendChild(c);
