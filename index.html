@@ -347,7 +347,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
       <input id="settingsUser" type="text" autocomplete="name" placeholder="اكتب اسم الموظف">
     </label>
     <p class="hint">سيتم حفظ الاسم على نفس الجهاز، وسيظهر تلقائيًا في أسفل صورة بيان نهاية الوردية.</p>
-    <a href="owner/" id="toOps" style="display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none;font-weight:700">إدارة العمليات (للمديرين — بكود دخول)</a>
+    <a href="https://mohamedelhessy1995-jpg.github.io/kemet-ops/" target="_blank" rel="noopener" id="toOps" style="display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none;font-weight:700">إدارة العمليات (للمديرين — بكود دخول)</a>
     <div class="row">
       <button type="button" class="primary" id="saveSettings">حفظ الإعدادات</button>
       <button type="button" id="closeSettings">إغلاق</button>
@@ -637,6 +637,8 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
     st.qty=h.qty||st.qty||'';st.name=h.name||st.name;st.client=h.client||'';st.cargo=h.cargo||'';st.berth=h.berth||'';
     st.stores=JSON.parse(JSON.stringify(h.stores||[]));if(!st.stores.length)st.stores=[{type:'مخزن',name:''}];
     st.eq=JSON.parse(JSON.stringify(h.eq||{}));st.eqContractors=JSON.parse(JSON.stringify(h.eqContractors||{}));st.stops=JSON.parse(JSON.stringify(h.stops||[]));
+    if(Array.isArray(h.cargoes)&&h.cargoes.length){st.cargoes=JSON.parse(JSON.stringify(h.cargoes));st.labor=JSON.parse(JSON.stringify(h.labor||[]));if(h.vesselRef)st.vesselRef=h.vesselRef;}
+    if(h.equipment&&Object.keys(h.equipment).length){ensurePeriodic();st.periodic.equipment=JSON.parse(JSON.stringify(h.equipment));}
     st.noteD=h.shift==='نهاري'?(h.note||''):'';st.noteN=h.shift==='ليلي'?(h.note||''):'';st.laborContractor=h.laborContractor||'';st.laborCount=h.laborCount||'';st.holds=h.holds||'';st.factories=JSON.parse(JSON.stringify(h.factories||[]));
     $('historyModal').hidden=true;renderAll();save();setTab('periodic');toast('تم فتح بيان نهاية الوردية المحفوظ للتعديل. بعد إعادة الإرسال سيتم تحديث نفس السجل.');window.scrollTo(0,0);
     });
@@ -739,7 +741,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
         card.appendChild(shipBox);
       }else if(key!=='cranes'||wh){
         var contractorBox=document.createElement('div');contractorBox.style.cssText='display:flex;flex-direction:column;gap:8px';
-        function renderEquipmentContractors(){contractorBox.textContent='';obj.contractors.forEach(function(c,i){if(!c.kind)c.kind='contractor';var cg=document.createElement('div');cg.className='contractor-card';var ch=document.createElement('h3');ch.textContent=xKind(c)+(i+1)+' — '+def[1];cg.appendChild(ch);var fields=document.createElement('div');fields.className='periodic-grid';var kindWrap=document.createElement('div');kindWrap.className='periodic-field';var kindLabel=document.createElement('label');kindLabel.textContent='الجهة';var kindSelect=document.createElement('select');(key==='cranes'?[['contractor','مقاول'],['company','شركة'],['land','ونش بري']]:[['contractor','مقاول'],['company','شركة']]).forEach(function(a){var op=document.createElement('option');op.value=a[0];op.textContent=a[1];kindSelect.appendChild(op);});kindSelect.value=c.kind;kindSelect.addEventListener('change',function(){c.kind=kindSelect.value;renderEquipmentContractors();pSave();});kindWrap.appendChild(kindLabel);kindWrap.appendChild(kindSelect);fields.appendChild(kindWrap);pField(fields,c.kind==='company'?'اسم الشركة':(c.kind==='land'?'اسم الونش / المقاول':'اسم المقاول'),c.name,'text',c.kind==='company'?'اكتب اسم الشركة':(c.kind==='land'?'اكتب اسم الونش البري أو المقاول':'اكتب اسم المقاول'),function(v){c.name=v;});var countInput=pField(fields,key==='cranes'?'عدد الأوناش':'العدد',c.count,'text',key==='cranes'?'اكتب عدد الأوناش':'اكتب العدد',function(v){c.count=v;});countInput.inputMode='numeric';xTimeRow(fields,c,pSave,key);if(def[2])pField(fields,'أكواد المعدات (كل كود في سطر مستقل)',c.codes,'textarea','اكتب الكود الأول ثم انزل سطرًا للكود التالي',function(v){c.codes=v;});cg.appendChild(fields);var rm=document.createElement('button');rm.type='button';rm.className='danger ghost';rm.textContent='حذف '+(c.kind==='company'?'الشركة':'المقاول');rm.addEventListener('click',function(){if(d.removed)d.removed.push(xCK(key,c));obj.contractors.splice(i,1);renderEquipmentContractors();pSave();});cg.appendChild(rm);contractorBox.appendChild(cg);});if(addCo)contractorBox.appendChild(addCo);}
+        function renderEquipmentContractors(){contractorBox.textContent='';obj.contractors.forEach(function(c,i){if(!c.kind)c.kind='contractor';var cg=document.createElement('div');cg.className='contractor-card';var ch=document.createElement('h3');ch.textContent=xKind(c)+(i+1)+' — '+def[1];cg.appendChild(ch);var fields=document.createElement('div');fields.className='periodic-grid';var kindWrap=document.createElement('div');kindWrap.className='periodic-field';var kindLabel=document.createElement('label');kindLabel.textContent='الجهة';var kindSelect=document.createElement('select');(key==='cranes'?[['contractor','مقاول'],['company','شركة'],['land','ونش بري']]:[['contractor','مقاول'],['company','شركة']]).forEach(function(a){var op=document.createElement('option');op.value=a[0];op.textContent=a[1];kindSelect.appendChild(op);});kindSelect.value=c.kind;kindSelect.addEventListener('change',function(){c.kind=kindSelect.value;renderEquipmentContractors();pSave();});kindWrap.appendChild(kindLabel);kindWrap.appendChild(kindSelect);fields.appendChild(kindWrap);pField(fields,c.kind==='company'?'اسم الشركة':(c.kind==='land'?'اسم الونش / المقاول':'اسم المقاول'),c.name,'text',c.kind==='company'?'اكتب اسم الشركة':(c.kind==='land'?'اكتب اسم الونش البري أو المقاول':'اكتب اسم المقاول'),function(v){c.name=v;});var countInput=pField(fields,key==='cranes'?'عدد الأوناش':'العدد',c.count,'text',key==='cranes'?'اكتب عدد الأوناش':'اكتب العدد',function(v){c.count=v;});countInput.inputMode='numeric';if(key==='tampers'){var tpI=pField(fields,'عدد النقلات',c.trips||'','text','اكتب عدد النقلات',function(v){c.trips=v;});tpI.inputMode='numeric';}xTimeRow(fields,c,pSave,key);if(def[2])pField(fields,'أكواد المعدات (كل كود في سطر مستقل)',c.codes,'textarea','اكتب الكود الأول ثم انزل سطرًا للكود التالي',function(v){c.codes=v;});cg.appendChild(fields);var rm=document.createElement('button');rm.type='button';rm.className='danger ghost';rm.textContent='حذف '+(c.kind==='company'?'الشركة':'المقاول');rm.addEventListener('click',function(){if(d.removed)d.removed.push(xCK(key,c));obj.contractors.splice(i,1);renderEquipmentContractors();pSave();});cg.appendChild(rm);contractorBox.appendChild(cg);});if(addCo)contractorBox.appendChild(addCo);}
         var addCo=document.createElement('button');addCo.type='button';addCo.textContent=key==='cranes'?'+ إضافة ونش بري / مقاول أوناش (بوقت بداية ونهاية)':(key==='generators'?'+ إضافة مولد / مقاول مولدات (بوقت بداية ونهاية)':'+ إضافة شركة / مقاول '+def[1]);addCo.addEventListener('click',function(){obj.contractors.push({kind:(key==='cranes'&&obj.craneType!=='land')?'land':'contractor',name:'',count:'',codes:'',from:'',to:''});renderEquipmentContractors();pSave();});card.appendChild(contractorBox);renderEquipmentContractors();
       }
       if(wh&&key==='cranes'){
@@ -888,7 +890,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
     equipment.forEach(function(e){
       y+=4;ctx.fillStyle='#eaf0f4';ctx.fillRect(M,y,W-2*M,58);
       text(e.label,W-M-14,y+40,'800',34,C.ink);y+=72;
-      if(e.key==='cranes'){addLines('نوع الأوناش',u.targetType==='warehouse'?'أوناش المخزن':(e.craneType==='land'?'أوناش بري':'أوناش مركب'));if(e.craneType!=='land')addLines('عدد أوناش المركب',e.craneCount);}(e.contractors||[]).forEach(function(c,i){addLines(xKind(c).trim()+' '+(i+1),c.name||'—');addLines('العدد',c.count||'—');if(c.from||c.to)addLines('وقت العمل','من '+(c.from||'—')+' إلى '+(c.to||'—'));if(c.codes)addLines('أكواد المعدات',c.codes);});if(e.key==='cranes'){if(e.craneType==='land'){(e.landCranes||[]).forEach(function(c,i){addLines('ونش بري '+(i+1),'الكود: '+(c.code||'—')+' | من '+(c.from||'—')+' إلى '+(c.to||'—'));});}else{if(e.crewContractor)addLines('اسم المقاول',e.crewContractor);addLines('طاقم الوناشين','كبلجية: '+(e.crew.cablemen||0)+' | هكاكين: '+(e.crew.hookmen||0)+' | وناشين: '+(e.crew.operators||0)+' | عصفورة: '+(e.crew.signal||0));}}y+=8;
+      if(e.key==='cranes'){addLines('نوع الأوناش',u.targetType==='warehouse'?'أوناش المخزن':(e.craneType==='land'?'أوناش بري':'أوناش مركب'));if(e.craneType!=='land')addLines('عدد أوناش المركب',e.craneCount);}(e.contractors||[]).forEach(function(c,i){addLines(xKind(c).trim()+' '+(i+1),c.name||'—');addLines('العدد',c.count||'—');if(c.trips)addLines('عدد النقلات',c.trips);if(c.from||c.to)addLines('وقت العمل','من '+(c.from||'—')+' إلى '+(c.to||'—'));if(c.codes)addLines('أكواد المعدات',c.codes);});if(e.key==='cranes'){if(e.craneType==='land'){(e.landCranes||[]).forEach(function(c,i){addLines('ونش بري '+(i+1),'الكود: '+(c.code||'—')+' | من '+(c.from||'—')+' إلى '+(c.to||'—'));});}else{if(e.crewContractor)addLines('اسم المقاول',e.crewContractor);addLines('طاقم الوناشين','كبلجية: '+(e.crew.cablemen||0)+' | هكاكين: '+(e.crew.hookmen||0)+' | وناشين: '+(e.crew.operators||0)+' | عصفورة: '+(e.crew.signal||0));}}y+=8;
     });
     var workContractors=contractors.filter(function(c){return c.type!=='عمالة';});
     var labor=contractors.filter(function(c){return c.type==='عمالة';});
@@ -1055,7 +1057,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
   });
   $('newDay').addEventListener('click',function(){
     askConfirm('سيتم حفظ ملخص اليوم الحالي في السجل قبل بدء يوم جديد. هل تريد المتابعة؟',function(){
-    var snap={cargoes:JSON.parse(JSON.stringify(st.cargoes||[])),labor:JSON.parse(JSON.stringify(st.labor||[])),vesselRef:st.vesselRef||null,laborContractor:st.laborContractor||'',laborCount:st.laborCount||'',date:st.date||today(),shift:st.shift,op:st.op,total:st.total||'',cur:st.cur||'',qty:st.qty||'',name:st.name||'',client:st.client||'',cargo:st.cargo||'',berth:st.berth||'',holds:st.holds||'',factories:JSON.parse(JSON.stringify(st.factories||[])),stores:JSON.parse(JSON.stringify(st.stores||[])),eq:JSON.parse(JSON.stringify(st.eq||{})),eqContractors:JSON.parse(JSON.stringify(st.eqContractors||{})),stops:JSON.parse(JSON.stringify((st.stops||[]).filter(function(x){return x.shift===st.shift&&String(x.equip||'').trim();}))),note:(st.shift==='ليلي'?st.noteN:st.noteD)||'',savedAt:new Date().toISOString()};
+    var snap={cargoes:JSON.parse(JSON.stringify(st.cargoes||[])),labor:JSON.parse(JSON.stringify(st.labor||[])),vesselRef:st.vesselRef||null,laborContractor:st.laborContractor||'',laborCount:st.laborCount||'',date:st.date||today(),shift:st.shift,op:st.op,total:st.total||'',cur:st.cur||'',qty:st.qty||'',name:st.name||'',client:st.client||'',cargo:st.cargo||'',berth:st.berth||'',holds:st.holds||'',factories:JSON.parse(JSON.stringify(st.factories||[])),stores:JSON.parse(JSON.stringify(st.stores||[])),eq:JSON.parse(JSON.stringify(st.eq||{})),eqContractors:JSON.parse(JSON.stringify(st.eqContractors||{})),equipment:JSON.parse(JSON.stringify((st.periodic&&st.periodic.equipment)||{})),stops:JSON.parse(JSON.stringify((st.stops||[]).filter(function(x){return x.shift===st.shift&&String(x.equip||'').trim();}))),note:(st.shift==='ليلي'?st.noteN:st.noteD)||'',savedAt:new Date().toISOString()};
     if(!Array.isArray(st.history))st.history=[];if(!st.eqContractors)st.eqContractors={};
     st.history.push(snap);
     var d=new Date((st.date||today())+'T12:00:00');d.setDate(d.getDate()+1);
@@ -1156,7 +1158,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
       P_EQ.forEach(function(def){var z=sharedEq[def[0]]||{};var cs=(def[0]==='cranes'&&z.craneType!=='warehouse'?[]:(z.contractors||[]).filter(function(c){return String(c.name||'').trim()||String(c.count||'').trim()||String(c.codes||'').trim()||String(c.from||'').trim()||String(c.to||'').trim();}));if(!cs.length&&!(def[0]==='cranes'&&(z.craneCount||xLandCranes(z).some(function(c){return c.code||c.from||c.to;})||z.crewContractor||Object.values(z.crew||{}).some(function(v){return Number(v)>0;}))))return;
         T(def[1],R,y+28,'800',26,C.ink);y+=40;
         if(def[0]==='cranes'){T('نوع الأوناش: '+(z.craneType==='land'?'أوناش بري':'أوناش مركب')+(z.craneType==='land'?' — عدد الأوناش المسجلة: '+xLandCranes(z).length:' — العدد: '+(z.craneCount||'—')),R,y+26,'500',22,C.mute);y+=36;}
-        cs.forEach(function(c,i){var ln=xKind(c)+(i+1)+' — '+(c.name||'—')+' — العدد: '+(c.count||'0');if(c.from||c.to)ln+=' — من '+(c.from||'—')+' إلى '+(c.to||'—');wrap(ln,CW,'500',22).forEach(function(q){T(q,R,y+26,'500',22,C.mute);y+=32;});if(c.codes){wrap('الأكواد: '+c.codes,CW,'400',20).forEach(function(q){T(q,R,y+24,'400',20,C.mute);y+=30;});}});
+        cs.forEach(function(c,i){var ln=xKind(c)+(i+1)+' — '+(c.name||'—')+' — العدد: '+(c.count||'0');if(c.trips)ln+=' — النقلات: '+c.trips;if(c.from||c.to)ln+=' — من '+(c.from||'—')+' إلى '+(c.to||'—');wrap(ln,CW,'500',22).forEach(function(q){T(q,R,y+26,'500',22,C.mute);y+=32;});if(c.codes){wrap('الأكواد: '+c.codes,CW,'400',20).forEach(function(q){T(q,R,y+24,'400',20,C.mute);y+=30;});}});
         if(def[0]==='cranes'){if(z.craneType==='land'){(z.landCranes||[]).forEach(function(c,i){var line='ونش بري '+(i+1)+' — الكود: '+(c.code||'—')+' — من '+(c.from||'—')+' إلى '+(c.to||'—');wrap(line,CW,'400',20).forEach(function(q){T(q,R,y+24,'400',20,C.mute);y+=30;});});}else{if(z.crewContractor){T('اسم المقاول: '+z.crewContractor,R,y+24,'500',20,C.mute);y+=30;}var cr=z.crew||{};var crew='طاقم الوناشين: كبلجية '+(cr.cablemen||0)+' | هكاكين '+(cr.hookmen||0)+' | وناشين '+(cr.operators||0)+' | عصفورة '+(cr.signal||0);T(crew,R,y+24,'400',20,C.mute);y+=32;}}
         y+=8;
       });
@@ -1307,7 +1309,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
   function downloadLastImage(){$('share').click();}
   function xArchiveEndShift(){
     if(!Array.isArray(st.history))st.history=[];
-    var snap={archiveId:'s'+Date.now().toString(36),cargoes:JSON.parse(JSON.stringify(st.cargoes||[])),labor:JSON.parse(JSON.stringify(st.labor||[])),vesselRef:st.vesselRef||null,laborContractor:st.laborContractor||'',laborCount:st.laborCount||'',date:st.date||today(),shift:st.shift,op:st.op,total:st.total||'',cur:st.cur||'',qty:st.qty||'',name:st.name||'',client:st.client||'',cargo:st.cargo||'',berth:st.berth||'',holds:st.holds||'',factories:JSON.parse(JSON.stringify(st.factories||[])),stores:JSON.parse(JSON.stringify(st.stores||[])),eq:JSON.parse(JSON.stringify(st.eq||{})),eqContractors:JSON.parse(JSON.stringify(st.eqContractors||{})),stops:JSON.parse(JSON.stringify((st.stops||[]).filter(function(x){return x.shift===st.shift&&String(x.equip||'').trim();}))),note:(st.shift==='ليلي'?st.noteN:st.noteD)||'',savedAt:new Date().toISOString(),sentAs:'end-of-shift'};
+    var snap={archiveId:'s'+Date.now().toString(36),cargoes:JSON.parse(JSON.stringify(st.cargoes||[])),labor:JSON.parse(JSON.stringify(st.labor||[])),vesselRef:st.vesselRef||null,laborContractor:st.laborContractor||'',laborCount:st.laborCount||'',date:st.date||today(),shift:st.shift,op:st.op,total:st.total||'',cur:st.cur||'',qty:st.qty||'',name:st.name||'',client:st.client||'',cargo:st.cargo||'',berth:st.berth||'',holds:st.holds||'',factories:JSON.parse(JSON.stringify(st.factories||[])),stores:JSON.parse(JSON.stringify(st.stores||[])),eq:JSON.parse(JSON.stringify(st.eq||{})),eqContractors:JSON.parse(JSON.stringify(st.eqContractors||{})),equipment:JSON.parse(JSON.stringify((st.periodic&&st.periodic.equipment)||{})),stops:JSON.parse(JSON.stringify((st.stops||[]).filter(function(x){return x.shift===st.shift&&String(x.equip||'').trim();}))),note:(st.shift==='ليلي'?st.noteN:st.noteD)||'',savedAt:new Date().toISOString(),sentAs:'end-of-shift'};
     var oldIndex=editingShiftArchiveId?st.history.findIndex(function(h){return h.archiveId===editingShiftArchiveId;}):-1;if(oldIndex>=0){snap.archiveId=editingShiftArchiveId;st.history[oldIndex]=snap;}else st.history.push(snap);editingShiftArchiveId=null;save();renderHistory();renderShiftArchive();
   }
   $('make').addEventListener('click',async function(){
@@ -1381,7 +1383,8 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
     try{
       var r=await fetch(SYNC.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body,redirect:'follow'});
       var j=await r.json();
-      return {ok:!!(j&&j.ok),confirmed:!!(j&&j.ok)};
+      if(j&&j.ok&&j.unchanged){try{toast('مفيش أي تغيير عن آخر إرسال — لم يتم تحديث العمليات.');}catch(e){}}
+      return {ok:!!(j&&j.ok),confirmed:!!(j&&j.ok),unchanged:!!(j&&j.unchanged)};
     }catch(e){
       try{await fetch(SYNC.url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body});return {ok:true,confirmed:false};}catch(e2){return {ok:false,confirmed:false};}
     }
@@ -1460,7 +1463,15 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
   function xUniq(a){return a.filter(function(x,i){return x&&a.indexOf(x)===i;});}
   function xPackOf(t){return /معبأ|معبا|شوال|BAG|JUMBO|جامبو|PACK|CARTON|كرتون|طرد/i.test(String(t||''))?'معبأ':'صب';}
   function xCargoNew(r){return {id:uid(),client:(r&&r.client)||'',cargo:(r&&r.cargo)||'',op:st.op||'تفريغ',place:'مخازن',placeName:'',measure:(function(t){t=String(t||'');return /درافت/.test(t)?'درافت':/ميزان/.test(t)?'ميزان':/عد/.test(t)?'عد وحصر':'';})(r&&r.measure),pack:xPackOf((r&&r.cargo)||''),planned:r&&r.qty?String(r.qty):'',daily:'',total:'',draft:{before:'',after:''},scale:{trips:'',weight:'',scaleName:''},count:{trucks:'',units:'',unitType:'',trucksT:'',unitsT:''},startedHere:false,start:{date:'',time:''},endedHere:false,end:{date:'',time:''},haulers:[],noHaulers:false};}
+  /* المركب التجريبي (MV EXAMPLE) فيه معدات وكميات مثال: نفرّغه أول ما الموظف يختار مركبًا حقيقيًا أو يكتب اسمًا غير المثال */
+  function xUnExample(keepName){
+    if(!st||!st.isExample)return;
+    var b=blank();b.id=st.id;b.name=keepName||'';
+    Object.keys(st).forEach(function(k){delete st[k];});Object.keys(b).forEach(function(k){st[k]=b[k];});
+    st.isExample=false;store.example=false;try{$('exampleNote').hidden=true;}catch(e){}
+  }
   function xApply(v,force){
+    xUnExample('');
     st.vesselRef={voyage:String(v.voyage||''),berth:v.berth||'',loa:v.loa||'',agent:v.agent||'',equipOwner:v.equipOwner||v.equip||'',source:'VCM'};
     if(force||!st.name)st.name=v.vessel;
     if(st.isExample){st.isExample=false;store.example=false;try{$('exampleNote').hidden=true;}catch(e){}}
@@ -1483,7 +1494,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
       var q=xNorm(inp.value);if(!q&&document.activeElement!==inp)return;
       LISTS.vessels.filter(function(v){return !q||xNorm(v.vessel).indexOf(q)>-1||String(v.voyage).indexOf(inp.value.trim())>-1;}).slice(0,10).forEach(function(v){
         var b=xEl('button','');b.type='button';b.style.cssText='text-align:right;display:flex;flex-direction:column;gap:2px;padding:8px 12px;height:auto';
-        b.appendChild(xEl('strong','',v.vessel));b.appendChild(xEl('small','',xUniq((v.rows||[]).map(function(r){return r.client+' — '+r.cargo;})).join(' | ')+' — رحلة '+v.voyage+(v.berth?' — رصيف '+v.berth:'')));
+        b.appendChild(xEl('strong','',v.vessel));b.appendChild(xEl('small','',xUniq((v.rows||[]).map(function(r){return r.client+' — '+r.cargo;})).join(' | ')+(v.voyage?' — رحلة '+v.voyage:'')+(v.berth?' — رصيف '+v.berth:'')+(v.active?' — 🟢 '+v.active:'')));
         b.lastChild.style.color='var(--mute)';
         b.addEventListener('click',function(){inp.value='';list.textContent='';onPick(v);});list.appendChild(b);
       });
@@ -1496,20 +1507,46 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
   function xStatus(){
     xStatusEls.forEach(function(p){
       p.textContent='';var n=(st.name||'').trim();
+      if(p.id==='xPStatus'&&periodicTarget()==='warehouse'){p.hidden=true;return;}
       if(!n||!LISTS.vessels.length){p.hidden=true;return;}p.hidden=false;
       var ex=xExact(n);
-      if(ex){p.appendChild(xEl('strong','','✓ مركب من اللجنة — رحلة '+ex.voyage));p.style.borderInlineStart='4px solid var(--good)';return;}
+      if(ex){p.appendChild(xEl('strong','',ex.fromRecords?'✓ مركب شغّال عليه زميل — '+(ex.active||''):'✓ مركب من اللجنة — رحلة '+ex.voyage));p.style.borderInlineStart='4px solid var(--good)';return;}
       var sim=xSimilar(n);
       if(sim){p.style.borderInlineStart='4px solid var(--warn)';p.appendChild(xEl('span','','الاسم قريب من «'+sim.vessel+'» — هل تقصده؟'));var b=xEl('button','primary','اختيار «'+sim.vessel+'»');b.type='button';b.style.minHeight='36px';b.addEventListener('click',function(){xPick(sim);});p.appendChild(b);return;}
       p.style.borderInlineStart='4px solid var(--accent)';p.appendChild(xEl('span','','مركب غير موجود باللجنة — يُسمح بتسجيل المعدات فقط'));
     });
   }
-  function xPick(v){xApply(v,true);renderChips();renderForm();renderPeriodic();if(xFinalOpen)xFinalRender();toast('تم اختيار المركب «'+v.vessel+'» وتعبئة بياناته.');}
+  /* لو زميل كان شغال على المركب: نكمّل من آخر بيان له (الإجماليات + المعدات) بدل ما نبدأ من الصفر — بشرط إن مفيش عندي بيانات مدخلة */
+  function xHasProgress(){return (st.cargoes||[]).some(function(c){return num(c.daily)||num(c.total)||(c.haulers||[]).length;})||num(st.cur)||num(st.total);}
+  async function xContinueColleague(v){
+    try{
+      if(!syncOn()||navigator.onLine===false||!v||!v.vessel)return;
+      var r=await fetch(SYNC.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:SYNC.key,action:'vesselHistory',vessel:v.vessel}),redirect:'follow'});var j=await r.json();
+      if(!(j&&j.ok&&Array.isArray(j.records)))return;
+      if(normName(st.name)!==normName(v.vessel))return;
+      var Es=j.records.filter(function(x){return x.type==='E'&&x.data&&Array.isArray(x.data.cargoes)&&x.data.cargoes.length;}).sort(function(a,b){return xSeq(a)<xSeq(b)?-1:1;}),Ps=j.records.filter(function(x){return x.type==='P';}).sort(function(a,b){return (xSeq(a)<xSeq(b))?-1:1;});
+      var lastE=Es.pop(),lastP=Ps.pop(),did=[];
+      if(lastE&&!xHasProgress()){
+        var d=JSON.parse(JSON.stringify(lastE.data));
+        st.cargoes=d.cargoes.map(function(c){c.id=uid();return c;});
+        if(d.client)st.client=d.client;if(d.cargo)st.cargo=d.cargo;if(d.total)st.total=String(d.total);
+        if(d.berth)st.berth=d.berth;if(d.qty&&!num(st.qty))st.qty=String(d.qty);
+        st.cur='';st.stops=[];st.noteD='';st.noteN='';
+        xNewDay();did.push('إجماليات '+(lastE.shift||'')+' '+(lastE.date||''));
+      }
+      var pe=null,pn='';
+      if(lastE&&lastE.data&&lastE.data.sharedEquipment&&xEqHasData(lastE.data.sharedEquipment)){pe=lastE.data.sharedEquipment;pn=xSeq(lastE);}
+      if(lastP&&lastP.data&&lastP.data.equipment&&xEqHasData(lastP.data.equipment)&&(!pe||xSeq(lastP)>pn)){pe=lastP.data.equipment;}
+      if(pe){ensurePeriodic();if(!xEqHasData(st.periodic.equipment)){st.periodic.equipment=JSON.parse(JSON.stringify(pe));Object.keys(st.periodic.equipment).forEach(function(k){((st.periodic.equipment[k]||{}).contractors||[]).forEach(function(c){c.to='';});});did.push('المعدات');}}
+      if(did.length){save();renderAll();toast('كمّلت من بيان الزميل: '+did.join(' + ')+' — راجع وعدّل.');}
+    }catch(e){}
+  }
+  function xPick(v){xApply(v,true);renderChips();renderForm();renderPeriodic();if(xFinalOpen)xFinalRender();toast('تم اختيار المركب «'+v.vessel+'» وتعبئة بياناته.');xContinueColleague(v);}
   function xPickFromPeriodic(v){
     var n=xNorm(v.vessel),found=null;Object.keys(store.vessels).forEach(function(id){if(xNorm(store.vessels[id].name)===n&&!store.vessels[id].isExample)found=id;});
     if(found){switchTo(found);if(!st.vesselRef)xApply(v,false);}
     else{clearTimeout(saveT);store.vessels[st.id]=st;var s=blank();store.vessels[s.id]=s;store.cur=s.id;st=s;store.example=false;xApply(v,true);}
-    renderAll();toast('تم اختيار المركب «'+v.vessel+'».');
+    renderAll();toast('تم اختيار المركب «'+v.vessel+'».');xContinueColleague(v);
   }
   function xRefreshPickers(){xPickers.forEach(function(p){if(p.refresh)p.refresh();});xStatus();}
   var xPickers=[];
@@ -1872,7 +1909,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
   /* ---- البيان النهائي للمركب ---- */
   /* ================= v9: أقسام ذكية + مخازن + أوقات المعدات + بيان دوري جديد + تجميع النهائي ================= */
   function xKind(c){return c.kind==='company'?'شركة ':(c.kind==='land'?'ونش بري ':'مقاول ');}
-  function xTimes(c){return (c&&(c.from||c.to))?(' — من '+(c.from||'—')+' إلى '+(c.to||'—')):'';}
+  function xTimes(c){return ((c&&c.trips)?(' — النقلات: '+c.trips):'')+((c&&(c.from||c.to))?(' — من '+(c.from||'—')+' إلى '+(c.to||'—')):'');}
   function xTimeRow(fields,c,pS,key){
     var land=c.kind==='land'||key==='generators';
     xField(fields,land?'بداية العمل':'وقت البداية',c,'from','time','','',function(){pS();});
@@ -1924,7 +1961,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
     if(!Array.isArray(st.eqRuns))st.eqRuns=[];
     var next=[];
     [['bri','ونش بري'],['gen','مولد']].forEach(function(k){
-      var n=Math.min(20,Math.max(0,Math.floor(num((st.eq||{})[k[0]]))));var old=st.eqRuns.filter(function(r){return r&&r.type===k[1];});
+      var n=0;/* صف ونش بري/مولد المكرر أُلغي: الأكواد والأوقات داخل قسم الأوناش/المولدات فوق */var old=st.eqRuns.filter(function(r){return r&&r.type===k[1];});
       for(var q=0;q<n;q++){var r=old[q]||{type:k[1],code:'',from:'',to:''};r.type=k[1];r.no=q+1;r.name=(st.eqContractors&&st.eqContractors[k[0]])||'';r.count='1';next.push(r);}
     });
     st.eqRuns=next;sec.hidden=!next.length;box.textContent='';
@@ -1969,7 +2006,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
   }
   function xRenderEqRunsData(){
     if(!Array.isArray(st.eqRuns))st.eqRuns=[];var next=[];
-    [['bri','ونش بري'],['gen','مولد']].forEach(function(k){var n=Math.min(20,Math.max(0,Math.floor(num((st.eq||{})[k[0]]))));var old=st.eqRuns.filter(function(r){return r&&r.type===k[1];});
+    [['bri','ونش بري'],['gen','مولد']].forEach(function(k){var n=0;/* صف ونش بري/مولد المكرر أُلغي: الأكواد والأوقات داخل قسم الأوناش/المولدات فوق */var old=st.eqRuns.filter(function(r){return r&&r.type===k[1];});
       for(var q=0;q<n;q++){var r=old[q]||{type:k[1],code:'',from:'',to:''};r.type=k[1];r.no=q+1;r.name=(st.eqContractors&&st.eqContractors[k[0]])||'';r.count='1';next.push(r);}});
     st.eqRuns=next;
   }
@@ -2009,6 +2046,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
       if(num(r.count)>num(row.count))row.count=String(r.count);
       row.codes=codesU(row.codes,r.codes);if(r.from&&!row.from)row.from=r.from;if(r.to)row.to=r.to;
       if(tag&&row.seen.indexOf(tag)<0)row.seen.push(tag);
+      if(key==='tampers'&&num(r.trips)>0){row.tr=row.tr||{};row.tr[tag]=Math.max(num(row.tr[tag]),num(r.trips));row.trips=String(Object.keys(row.tr).reduce(function(a,k){return a+row.tr[k];},0));}
     }
     recs.forEach(function(r){
       var d=r.data||{},tag=(r.date||'')+' '+(r.shift==='ليلي'?'ليلي':'نهاري');
@@ -2043,7 +2081,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
       if(f.removed.indexOf(r.ck)>-1)return;
       var hit=null;obj.contractors.forEach(function(c){if(xCK(r.key,c)===r.ck)hit=c;});
       if(!hit){obj.contractors.push(JSON.parse(JSON.stringify(r.row)));ch++;}
-      else{hit.seen=r.row.seen.slice();if(!hit.from&&r.row.from){hit.from=r.row.from;ch++;}if(!hit.to&&r.row.to){hit.to=r.row.to;ch++;}if(!num(hit.count)&&num(r.row.count)){hit.count=r.row.count;ch++;}if(!hit.codes&&r.row.codes){hit.codes=r.row.codes;ch++;}}
+      else{hit.seen=r.row.seen.slice();if(r.key==='tampers'&&num(r.row.trips)>num(hit.trips)){hit.trips=r.row.trips;ch++;}if(!hit.from&&r.row.from){hit.from=r.row.from;ch++;}if(!hit.to&&r.row.to){hit.to=r.row.to;ch++;}if(!num(hit.count)&&num(r.row.count)){hit.count=r.row.count;ch++;}if(!hit.codes&&r.row.codes){hit.codes=r.row.codes;ch++;}}
     });
     Object.keys(a.ex).forEach(function(k){var x=a.ex[k],obj=f.equipment[k];if(!obj&&k==='cranes'&&(x.craneCount||x.craneType||x.crewContractor||x.landCodes||x.landFrom||x.landTo||Object.keys(x.crew||{}).length)){obj=f.equipment[k]={count:'',codes:'',contractors:[]};}if(!obj)return;
       if(k==='cranes'){if(!obj.craneType&&x.craneType){obj.craneType=x.craneType;ch++;}if(!obj.craneCount&&x.craneCount){obj.craneCount=x.craneCount;ch++;}if(!obj.crewContractor&&x.crewContractor){obj.crewContractor=x.crewContractor;ch++;}if(x.landCodes&&!obj.landCodes){obj.landCodes=x.landCodes;ch++;}if(x.landFrom&&!obj.landFrom){obj.landFrom=x.landFrom;ch++;}if(x.landTo&&!obj.landTo){obj.landTo=x.landTo;ch++;}obj.landCranes=obj.landCranes||[];(x.landCranes||[]).forEach(function(c){var sig=[c.code||'',c.from||'',c.to||''].join('|');if(!obj.landCranes.some(function(q){return [q.code||'',q.from||'',q.to||''].join('|')===sig;})){obj.landCranes.push({code:c.code||'',from:c.from||'',to:c.to||''});ch++;}});obj.crew=obj.crew||{};Object.keys(x.crew||{}).forEach(function(q){if(!num(obj.crew[q])&&num(x.crew[q])){obj.crew[q]=x.crew[q];ch++;}});}});
@@ -2218,7 +2256,9 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
     var pk=xPicker(xPick);xPickers.push(pk);h2.insertAdjacentElement('afterend',pk);
     var stt=xStatusMake();$('name').closest('label').insertAdjacentElement('afterend',stt);
     $('name').addEventListener('change',function(){if(LISTS.vessels.length){var ex=xExact(st.name);if(ex)xApply(ex,false);}xStatus();});
-    $('name').addEventListener('input',function(){xStatus();});
+    $('name').addEventListener('input',function(){
+      if(st.isExample&&$('name').value.trim()&&$('name').value.trim().toUpperCase()!=='MV EXAMPLE'){var nm=$('name').value;xUnExample(nm);renderAll();var el=$('name');try{el.focus();el.setSelectionRange(nm.length,nm.length);}catch(e){}}
+      xStatus();});
     /* أقسام البضاعة */
     var cs=document.createElement('section');cs.id='xCargoSec';cs.setAttribute('aria-label','أقسام البضاعة');
     cs.innerHTML='<h2>أقسام البضاعة <small id="xCargoCount"></small></h2><p class="hint">قسم لكل عميل + بضاعة. لو على المركب أكثر من بضاعة أضف قسمًا لكل واحدة.</p><div id="xCargoes" style="display:flex;flex-direction:column;gap:10px"></div><button type="button" id="xAddCargo">+ إضافة بضاعة / عميل</button>';
@@ -2291,10 +2331,23 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
     $('pDate').value=xPDate();
   }
   /* جلب اللجنة والقوائم من السيرفر (بصمت) */
+  /* مراكب الزملاء النشطة (اتسجّل عليها بيانات في آخر أيام) تظهر لكل الموظفين حتى لو مش في اللجنة */
+  function xMergeActive(vs,act){
+    vs=(vs||[]).map(function(v){return v;});if(!Array.isArray(act))return vs;
+    act.forEach(function(a){if(!a||!a.vessel)return;var n=xNorm(a.vessel),hit=null;vs.forEach(function(v){if(xNorm(v.vessel)===n)hit=v;});
+      var tag=(a.by&&a.by.length?'آخر بيان: '+a.by.join('، '):'')+(a.lastDate?' — '+a.lastDate+(a.lastShift?' '+a.lastShift:''):'');
+      if(hit){hit.active=tag;return;}
+      vs.push({voyage:'',vessel:a.vessel,berth:a.berth||'',rows:a.rows||[],status:'نشط',active:tag,fromRecords:true});});
+    return vs;
+  }
+  function xStoreList(){
+    var dl=$('xStoreDL');if(!dl){dl=document.createElement('datalist');dl.id='xStoreDL';document.body.appendChild(dl);try{$('pVessel').setAttribute('list','xStoreDL');}catch(e){}}
+    dl.textContent='';var seen={};((LISTS.lists&&LISTS.lists.stores)||[]).concat((LISTS.stores||[]).map(function(x){return x.name;})).concat((LISTS.lists&&LISTS.lists.yards)||[]).forEach(function(n){n=String(n||'').trim();if(!n||seen[n])return;seen[n]=1;var o=document.createElement('option');o.value=n;dl.appendChild(o);});
+  }
   async function xFetchLists(){
     if(!syncOn())return;if(navigator.onLine===false)return;
     try{var r=await fetch(SYNC.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:SYNC.key,action:'toolLists'}),redirect:'follow'});var j=await r.json();
-      if(j&&j.ok&&Array.isArray(j.vessels)){LISTS={vessels:j.vessels,lists:j.lists||{},at:new Date().toISOString()};try{localStorage.setItem(LK,JSON.stringify(LISTS));}catch(e){}xRefreshPickers();if(xFinalOpen)xFinalRender();else{xRenderEnd();}}
+      if(j&&j.ok&&Array.isArray(j.vessels)){LISTS={vessels:xMergeActive(j.vessels,j.active),lists:j.lists||{},stores:Array.isArray(j.activeStores)?j.activeStores:[],at:new Date().toISOString()};try{localStorage.setItem(LK,JSON.stringify(LISTS));}catch(e){}xRefreshPickers();try{xStoreList();}catch(e){}if(xFinalOpen)xFinalRender();else{xRenderEnd();}}
     }catch(e){}
   }
   /* تصدير CSV: صفوف الأقسام والبيان النهائي */
@@ -2309,7 +2362,10 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
     Object.keys(store.finals||{}).forEach(function(k){var f=store.finals[k];var hrs=(f.stops||[]).reduce(function(a,x){return a+num(x.hours);},0);(f.cargoes||[]).forEach(function(c){var r=[];for(var q=0;q<17;q++)r.push('');r[0]='بيان نهائي';r[1]=f.name||'';r[5]=c.client||'';r[6]=c.cargo||'';r[16]=(c.start&&c.start.date?'بداية '+c.start.date+' '+(c.start.time||''):'')+(c.end&&c.end.date?' | نهاية '+c.end.date+' '+(c.end.time||''):'')+(hrs?' | ساعات التوقف '+hrs:'')+((f.labor||[]).length?' | عمالة '+f.labor.map(function(l){return (l.name||'')+' '+(l.count||'');}).join(' + '):'')+(f.notes?' | '+f.notes:'');r=r.concat([c.total||'',c.op||'',c.place||'',c.placeName||'',c.measure||'',c.pack||'',c.planned||'','',(c.count&&c.count.trucksT)||'',(c.count&&c.count.unitsT)||'',(c.count&&c.count.unitType)||'',c.noHaulers?'بدون عربياتنا':(c.haulers||[]).map(function(h){return xTy(h)+' '+(h.name||'')+' '+(h.count||'');}).join(' | '),f.voyage||'']);out.push(r);});});
     return out;
   }
-  function xInit(){xBuild();if(syncOn()){setTimeout(xFetchLists,1200);window.addEventListener('online',xFetchLists);}}
+  var xLastFetch=0;
+  function xFetchSoon(){var n=Date.now();if(n-xLastFetch<60000)return;xLastFetch=n;xFetchLists();}
+  function xInit(){xBuild();if(syncOn()){setTimeout(function(){xLastFetch=Date.now();xFetchLists();},1200);window.addEventListener('online',xFetchLists);
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)xFetchSoon();});setInterval(function(){if(!document.hidden)xFetchSoon();},300000);}}
   function xPU(u){if(!u.uid)u.uid='p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);return u.uid;}
 
   load();xInit();
