@@ -1939,7 +1939,8 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
   }
   function xStoresFromTop(){
     if(xMulti()||!st.cargoes[0])return;var c=st.cargoes[0];
-    var top=(st.stores||[]).filter(function(r){return r&&String(r.name||'').trim();});if(!top.length)return;
+    var top=(st.stores||[]).filter(function(r){return r&&String(r.name||'').trim();});
+    if(!top.length){var rs=(st.stores||[]).filter(Boolean);if(rs.length&&c.place!=='مباشر')c.place=rs.every(function(r){return r.type==='ساحة';})?'ساحات':'مخازن';return;}
     var old={};(c.stores||[]).forEach(function(x){if(x&&x.name)old[xNorm(x.name)]=x.qty;});
     c.stores=top.map(function(r){return {name:String(r.name).trim(),qty:old[xNorm(r.name)]||''};});
     if(c.place==='مباشر'||true)c.place=top.every(function(r){return r.type==='ساحة';})?'ساحات':'مخازن';
@@ -1949,7 +1950,7 @@ button.primary{background:#c8541a;border-color:#c8541a;color:#fff}
     if(xMulti()||!st.cargoes[0])return;var c=st.cargoes[0];if(c.place==='مباشر')return;
     var def=c.place==='ساحات'?'ساحة':'مخزن',oldT={};(st.stores||[]).forEach(function(r){if(r&&r.name)oldT[xNorm(r.name)]=r.type;});
     var nm=(c.stores||[]).filter(function(x){return x&&String(x.name||'').trim();});
-    st.stores=nm.length?nm.map(function(x){return {type:oldT[xNorm(x.name)]||def,name:String(x.name).trim()};}):[{type:def,name:''}];
+    st.stores=nm.length?nm.map(function(x){return {type:oldT[xNorm(x.name)]||def,name:String(x.name).trim()};}):((st.stores&&st.stores.length)?st.stores:[{type:def,name:''}]);
     renderStores();save();
   }
   function xTopStoresChanged(){if(xMulti())return;xStoresFromTop();xRenderCargoes();}
